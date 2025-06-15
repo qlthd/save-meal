@@ -30,7 +30,7 @@ import { LoginModal } from "@/components/LoginModal";
 const mockPastDonations = [
   {
     id: 1,
-    title: "Surplus de fête d'entreprise",
+    title: "Surplus de f��te d'entreprise",
     description: "Buffet complet avec desserts",
     portions: 45,
     location: "14ème arrondissement, Paris",
@@ -192,9 +192,17 @@ export default function MesDonationsPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Mes donations
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 mb-6">
             Gérez vos donations passées et à venir
           </p>
+
+          {/* Create new donation button */}
+          <Link href="/donner">
+            <Button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+              <span className="text-xl mr-2">+</span>
+              Créer une nouvelle donation
+            </Button>
+          </Link>
         </div>
 
         <div className="space-y-6">
@@ -356,16 +364,6 @@ export default function MesDonationsPage() {
                         )}
                       </Card>
                     ))}
-
-                    {/* Add new donation button */}
-                    <div className="pt-4 border-t border-gray-200">
-                      <Link href="/donner">
-                        <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                          <span className="text-lg mr-2">+</span>
-                          Créer une nouvelle donation
-                        </Button>
-                      </Link>
-                    </div>
                   </div>
                 </div>
               </CollapsibleContent>
