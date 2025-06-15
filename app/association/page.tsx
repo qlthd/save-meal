@@ -16,6 +16,7 @@ import {
   Mail,
 } from "lucide-react";
 import Link from "next/link";
+import { LoginModal } from "@/components/LoginModal";
 
 // Mock data for food donations
 const mockDonations = [
@@ -63,6 +64,7 @@ const mockDonations = [
 export default function AssociationPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDonation, setSelectedDonation] = useState<number | null>(null);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   const filteredDonations = mockDonations.filter(
     (donation) =>
@@ -104,6 +106,13 @@ export default function AssociationPage() {
                 Mes donations
               </Button>
             </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLoginModalOpen(true)}
+            >
+              Se connecter
+            </Button>
             <Badge variant="secondary" className="bg-green-100 text-green-800">
               Association
             </Badge>
@@ -111,6 +120,8 @@ export default function AssociationPage() {
         </div>
       </nav>
 
+      {/* Login Modal */}
+      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

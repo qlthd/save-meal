@@ -22,9 +22,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { LoginModal } from "@/components/LoginModal";
 
 export default function DonnerPage() {
   const [donationType, setDonationType] = useState<"now" | "later">("now");
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -107,6 +109,13 @@ export default function DonnerPage() {
                 Mes donations
               </Button>
             </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLoginModalOpen(true)}
+            >
+              Se connecter
+            </Button>
             <Badge
               variant="secondary"
               className="bg-orange-100 text-orange-800"
@@ -117,6 +126,8 @@ export default function DonnerPage() {
         </div>
       </nav>
 
+      {/* Login Modal */}
+      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-8">

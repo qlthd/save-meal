@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -10,8 +13,11 @@ import {
   Clock,
 } from "lucide-react";
 import Link from "next/link";
+import { LoginModal } from "@/components/LoginModal";
 
 export default function HomePage() {
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-orange-50">
       {/* Navigation */}
@@ -33,12 +39,19 @@ export default function HomePage() {
                 Mes donations
               </Button>
             </Link>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLoginModalOpen(true)}
+            >
               Se connecter
             </Button>
           </div>
         </div>
       </nav>
+
+      {/* Login Modal */}
+      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
 
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

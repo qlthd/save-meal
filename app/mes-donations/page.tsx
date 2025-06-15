@@ -24,6 +24,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { LoginModal } from "@/components/LoginModal";
 
 // Mock data for user donations
 const mockPastDonations = [
@@ -95,6 +96,7 @@ const mockUpcomingDonations = [
 export default function MesDonationsPage() {
   const [pastCollapsed, setPastCollapsed] = useState(true);
   const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -163,11 +165,26 @@ export default function MesDonationsPage() {
               </span>
             </Link>
           </div>
-          <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-            Mes donations
-          </Badge>
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLoginModalOpen(true)}
+            >
+              Se connecter
+            </Button>
+            <Badge
+              variant="secondary"
+              className="bg-purple-100 text-purple-800"
+            >
+              Mes donations
+            </Badge>
+          </div>
         </div>
       </nav>
+
+      {/* Login Modal */}
+      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
