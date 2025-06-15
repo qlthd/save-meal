@@ -23,11 +23,12 @@ export default function HomePage() {
       {/* Navigation */}
       <nav className="w-full px-4 sm:px-6 lg:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-orange-500 rounded-lg flex items-center justify-center">
-              <ChefHat className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">DonPartage</span>
+          <Link href="/" className="flex items-center">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2Ff43b620574114d128cc3d1644c6ee463?format=webp&width=800"
+              alt="Save Meal Logo"
+              className="h-10 w-auto"
+            />
           </Link>
           <div className="flex items-center space-x-4">
             <Link href="/mes-donations">
@@ -236,16 +237,12 @@ export default function HomePage() {
       <footer className="bg-gray-50 border-t border-gray-200 py-12 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <Link
-              href="/"
-              className="flex items-center justify-center space-x-2 mb-4"
-            >
-              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-orange-500 rounded-lg flex items-center justify-center">
-                <ChefHat className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">
-                DonPartage
-              </span>
+            <Link href="/" className="flex items-center justify-center mb-4">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2Ff43b620574114d128cc3d1644c6ee463?format=webp&width=800"
+                alt="Save Meal Logo"
+                className="h-10 w-auto"
+              />
             </Link>
             <p className="text-gray-600 mb-4">
               Ensemble contre le gaspillage alimentaire

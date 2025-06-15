@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
-  title: "DonPartage - Transformons les surplus alimentaires en solidarité",
+  title: "Save Meal - Transformons les surplus alimentaires en solidarité",
   description:
     "Connectons les organisateurs d'événements aux associations pour que chaque repas trouve sa place. Lutte contre le gaspillage alimentaire.",
 };

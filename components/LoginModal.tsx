@@ -83,7 +83,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
           <p className="text-sm text-gray-600 mt-2">
             {mode === "login"
               ? "Connectez-vous pour accéder à votre compte"
-              : "Rejoignez DonPartage pour commencer à donner"}
+              : "Rejoignez Save Meal pour commencer à donner"}
           </p>
         </DialogHeader>
 
