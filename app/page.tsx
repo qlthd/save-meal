@@ -60,9 +60,10 @@ export default function HomePage() {
             {/* Hero Image */}
             <div className="mb-8 flex justify-center">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F08977d5ed02b4f37b4033b8c640e4e14?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F08977d5ed02b4f37b4033b8c640e4e14?format=webp&width=800&removeBackground=true"
                 alt="Main tenant un cœur et un épi de blé symbolisant la solidarité alimentaire"
                 className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 object-contain"
+                style={{ filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1))" }}
               />
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
