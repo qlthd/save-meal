@@ -9,6 +9,7 @@ import {
   Globe,
   Clock,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -46,14 +47,16 @@ const Index = () => {
 
             {/* Main Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
-              >
-                <Users className="w-5 h-5 mr-2" />
-                Je suis une association
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <Link to="/association" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
+                >
+                  <Users className="w-5 h-5 mr-2" />
+                  Je suis une association
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
               <Button
                 size="lg"
                 variant="secondary"
