@@ -76,7 +76,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             <img
               src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2Ff43b620574114d128cc3d1644c6ee463?format=webp&width=800"
               alt="Save Meal Logo"
-              className="h-12 w-auto"
+              className="h-16 w-auto"
             />
           </div>
           <DialogTitle className="text-2xl font-bold text-gray-900">

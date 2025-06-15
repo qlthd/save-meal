@@ -27,7 +27,7 @@ export default function HomePage() {
             <img
               src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2Ff43b620574114d128cc3d1644c6ee463?format=webp&width=800"
               alt="Save Meal Logo"
-              className="h-10 w-auto"
+              className="h-14 w-auto"
             />
           </Link>
           <div className="flex items-center space-x-4">
@@ -241,7 +241,7 @@ export default function HomePage() {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2Ff43b620574114d128cc3d1644c6ee463?format=webp&width=800"
                 alt="Save Meal Logo"
-                className="h-10 w-auto"
+                className="h-14 w-auto"
               />
             </Link>
             <p className="text-gray-600 mb-4">
