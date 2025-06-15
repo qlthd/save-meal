@@ -57,6 +57,14 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center py-12 sm:py-16 lg:py-20">
           <div className="max-w-4xl mx-auto">
+            {/* Hero Image */}
+            <div className="mb-8 flex justify-center">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F08977d5ed02b4f37b4033b8c640e4e14?format=webp&width=800"
+                alt="Main tenant un cœur et un épi de blé symbolisant la solidarité alimentaire"
+                className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 object-contain"
+              />
+            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Transformons les{" "}
               <span className="bg-gradient-to-r from-green-600 to-orange-500 bg-clip-text text-transparent">
