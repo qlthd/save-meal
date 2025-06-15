@@ -23,9 +23,20 @@ export default function HomePage() {
             </div>
             <span className="text-xl font-bold text-gray-900">DonPartage</span>
           </Link>
-          <Button variant="outline" size="sm">
-            Se connecter
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Link href="/mes-donations">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-600 hover:text-green-600"
+              >
+                Mes donations
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm">
+              Se connecter
+            </Button>
+          </div>
         </div>
       </nav>
 

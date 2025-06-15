@@ -94,9 +94,20 @@ export default function AssociationPage() {
               </span>
             </Link>
           </div>
-          <Badge variant="secondary" className="bg-green-100 text-green-800">
-            Association
-          </Badge>
+          <div className="flex items-center space-x-4">
+            <Link href="/mes-donations">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-600 hover:text-green-600"
+              >
+                Mes donations
+              </Button>
+            </Link>
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              Association
+            </Badge>
+          </div>
         </div>
       </nav>
 

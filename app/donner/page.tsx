@@ -97,9 +97,23 @@ export default function DonnerPage() {
               </span>
             </Link>
           </div>
-          <Badge variant="secondary" className="bg-orange-100 text-orange-800">
-            Donateur
-          </Badge>
+          <div className="flex items-center space-x-4">
+            <Link href="/mes-donations">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-600 hover:text-green-600"
+              >
+                Mes donations
+              </Button>
+            </Link>
+            <Badge
+              variant="secondary"
+              className="bg-orange-100 text-orange-800"
+            >
+              Donateur
+            </Badge>
+          </div>
         </div>
       </nav>
 
