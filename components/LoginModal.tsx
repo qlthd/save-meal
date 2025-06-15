@@ -73,9 +73,11 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-orange-500 rounded-lg flex items-center justify-center">
-              <ChefHat className="w-6 h-6 text-white" />
-            </div>
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2Ff43b620574114d128cc3d1644c6ee463?format=webp&width=800"
+              alt="Save Meal Logo"
+              className="h-12 w-auto"
+            />
           </div>
           <DialogTitle className="text-2xl font-bold text-gray-900">
             {mode === "login" ? "Se connecter" : "Créer un compte"}
