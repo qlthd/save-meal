@@ -13,7 +13,7 @@ import {
   Phone,
   Mail,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 // Mock data for food donations
 const mockDonations = [

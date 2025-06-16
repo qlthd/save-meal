@@ -23,33 +23,62 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { LoginModal } from "@/web/components/LoginModal";
+import { Prisma } from "@/backend/generated/prisma";
+import { z, ZodType } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import FoodDonationCreateInput = Prisma.FoodDonationCreateInput;
+
+const FoodDonationSchema = z
+  .object({
+    title: z.string().min(1, "Le titre est requis"),
+    description: z.string().min(1, "La description est requise"),
+    foodType: z.string().min(1, "Le type de nourriture est requis"),
+    estimatedPortions: z
+      .string()
+      .min(1, "Le nombre de portions est requis")
+      .regex(/^\d+$/, "Doit être un nombre entier"),
+    location: z.string().min(1, "Le nom du lieu est requis"),
+    address: z.string().min(1, "L'adresse est requise"),
+    pickupInstructions: z.string().optional(),
+    contactName: z.string().min(1, "Le nom de contact est requis"),
+    contactPhone: z
+      .string()
+      .min(1, "Le téléphone de contact est requis")
+      .regex(/^\d+$/, "Doit être un numéro de téléphone valide"),
+    contactEmail: z.string().email("Doit être une adresse email valide"),
+    availableFrom: z.string().optional(),
+    availableTo: z
+      .string()
+      .min(1, "L'heure de disponibilité est requise")
+      .regex(/^\d{2}:\d{2}$/, "Doit être au format HH:MM"),
+    scheduledDate: z.string().optional(),
+    scheduledTime: z.string().optional(),
+    dietaryInfo: z.object({
+      vegetarian: z.boolean().optional(),
+      vegan: z.boolean().optional(),
+      glutenFree: z.boolean().optional(),
+      halal: z.boolean().optional(),
+      kosher: z.boolean().optional(),
+    }),
+    additionalNotes: z.string().optional(),
+  })
+  .refine((data) => data.donationType !== "now" || !!data.scheduledDate, {
+    message: "La date prévue est requise si le don est disponible maintenant.",
+    path: ["scheduledDate"],
+  });
 
 export default function DonnerPage() {
   const [donationType, setDonationType] = useState<"now" | "later">("now");
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    foodType: "",
-    portions: "",
-    location: "",
-    address: "",
-    pickupInstructions: "",
-    contactName: "",
-    contactPhone: "",
-    contactEmail: "",
-    availableFrom: "",
-    availableUntil: "",
-    scheduledDate: "",
-    scheduledTime: "",
-    dietaryInfo: {
-      vegetarian: false,
-      vegan: false,
-      glutenFree: false,
-      halal: false,
-      kosher: false,
-    },
-    additionalNotes: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<FoodDonationCreateInput>({
+    resolver: zodResolver(FoodDonationSchema),
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -69,7 +98,7 @@ export default function DonnerPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = (data: FoodDonationCreateInput) => {
     e.preventDefault();
     // Handle form submission
     console.log("Donation created:", { ...formData, type: donationType });
@@ -195,7 +224,7 @@ export default function DonnerPage() {
         </Card>
 
         {/* Main Form */}
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Food Details */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -208,53 +237,44 @@ export default function DonnerPage() {
               <div>
                 <Label htmlFor="title">Titre du don</Label>
                 <Input
-                  id="title"
+                  name="title"
+                  error={errors.title}
                   placeholder="Ex: Surplus de buffet d'entreprise"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  register={register}
                   className="mt-2"
-                  required
                 />
               </div>
               <div>
                 <Label htmlFor="foodType">Type de nourriture</Label>
                 <Input
-                  id="foodType"
+                  name="foodType"
+                  error={errors.foodType}
                   placeholder="Ex: Plats chauds, sandwichs, desserts..."
-                  value={formData.foodType}
-                  onChange={(e) =>
-                    handleInputChange("foodType", e.target.value)
-                  }
+                  register={register}
                   className="mt-2"
-                  required
                 />
               </div>
               <div>
                 <Label htmlFor="portions">Nombre de portions estimé</Label>
                 <Input
-                  id="portions"
+                  name="estimatedPortions"
+                  error={errors.estimatedPortions}
                   type="number"
                   placeholder="Ex: 50"
-                  value={formData.portions}
-                  onChange={(e) =>
-                    handleInputChange("portions", e.target.value)
-                  }
+                  register={register}
                   className="mt-2"
-                  required
                 />
               </div>
-              <div className="md:col-span-2">
+              <div className="grid md:col-span-2">
                 <Label htmlFor="description">Description détaillée</Label>
                 <Textarea
                   id="description"
+                  error={errors.description}
                   placeholder="Décrivez la nourriture disponible, les conditions de conservation, etc."
-                  value={formData.description}
-                  onChange={(e) =>
-                    handleInputChange("description", e.target.value)
-                  }
+                  name="description"
+                  register={register}
                   className="mt-2"
                   rows={3}
-                  required
                 />
               </div>
             </div>
@@ -275,11 +295,11 @@ export default function DonnerPage() {
                   <div key={key} className="flex items-center space-x-2">
                     <Checkbox
                       id={key}
-                      checked={
-                        formData.dietaryInfo[
-                          key as keyof typeof formData.dietaryInfo
-                        ]
-                      }
+                      // checked={
+                      //   formData.dietaryInfo[
+                      //     key as keyof typeof formData.dietaryInfo
+                      //   ]
+                      // }
                       onCheckedChange={(checked) =>
                         handleDietaryChange(key, checked as boolean)
                       }
@@ -305,38 +325,33 @@ export default function DonnerPage() {
               <div>
                 <Label htmlFor="location">Nom du lieu</Label>
                 <Input
-                  id="location"
+                  name="location"
+                  error={errors.location}
                   placeholder="Ex: Restaurant Le Gourmet"
-                  value={formData.location}
-                  onChange={(e) =>
-                    handleInputChange("location", e.target.value)
-                  }
+                  register={register}
                   className="mt-2"
-                  required
                 />
               </div>
               <div>
                 <Label htmlFor="address">Adresse complète</Label>
                 <Input
-                  id="address"
+                  name="address"
+                  error={errors.address}
                   placeholder="123 Rue de la Paix, 75001 Paris"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange("address", e.target.value)}
                   className="mt-2"
-                  required
+                  register={register}
                 />
               </div>
-              <div className="md:col-span-2">
+              <div className="grid md:col-span-2">
                 <Label htmlFor="pickupInstructions">
                   Instructions de récupération
                 </Label>
                 <Textarea
                   id="pickupInstructions"
+                  name="pickupInstructions"
+                  error={errors.pickupInstructions}
                   placeholder="Ex: Entrée par la porte de service, demander Jean au comptoir..."
-                  value={formData.pickupInstructions}
-                  onChange={(e) =>
-                    handleInputChange("pickupInstructions", e.target.value)
-                  }
+                  register={register}
                   className="mt-2"
                   rows={2}
                 />
@@ -355,29 +370,14 @@ export default function DonnerPage() {
             {donationType === "now" ? (
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="availableFrom">Disponible à partir de</Label>
+                  <Label htmlFor="availableTo">Disponible jusqu'à</Label>
                   <Input
-                    id="availableFrom"
+                    id="availableTo"
+                    name="availableTo"
+                    error={errors.availableTo}
                     type="time"
-                    value={formData.availableFrom}
-                    onChange={(e) =>
-                      handleInputChange("availableFrom", e.target.value)
-                    }
+                    register={register}
                     className="mt-2"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="availableUntil">Disponible jusqu'à</Label>
-                  <Input
-                    id="availableUntil"
-                    type="time"
-                    value={formData.availableUntil}
-                    onChange={(e) =>
-                      handleInputChange("availableUntil", e.target.value)
-                    }
-                    className="mt-2"
-                    required
                   />
                 </div>
               </div>
@@ -386,40 +386,31 @@ export default function DonnerPage() {
                 <div>
                   <Label htmlFor="scheduledDate">Date prévue</Label>
                   <Input
-                    id="scheduledDate"
+                    name="scheduledDate"
+                    error={errors.scheduledDate}
                     type="date"
-                    value={formData.scheduledDate}
-                    onChange={(e) =>
-                      handleInputChange("scheduledDate", e.target.value)
-                    }
+                    register={register}
                     className="mt-2"
-                    required
                   />
                 </div>
                 <div>
                   <Label htmlFor="scheduledTime">Heure prévue</Label>
                   <Input
-                    id="scheduledTime"
+                    name="scheduledTime"
+                    error={errors.availableFrom}
                     type="time"
-                    value={formData.scheduledTime}
-                    onChange={(e) =>
-                      handleInputChange("scheduledTime", e.target.value)
-                    }
+                    register={register}
                     className="mt-2"
-                    required
                   />
                 </div>
                 <div>
                   <Label htmlFor="availableUntil">Disponible jusqu'à</Label>
                   <Input
-                    id="availableUntil"
+                    name="availableTo"
+                    error={errors.availableTo}
                     type="time"
-                    value={formData.availableUntil}
-                    onChange={(e) =>
-                      handleInputChange("availableUntil", e.target.value)
-                    }
+                    register={register}
                     className="mt-2"
-                    required
                   />
                 </div>
               </div>
@@ -438,56 +429,46 @@ export default function DonnerPage() {
               <div>
                 <Label htmlFor="contactName">Nom complet</Label>
                 <Input
-                  id="contactName"
+                  name="contactName"
+                  error={errors.contactName}
                   placeholder="Jean Dupont"
-                  value={formData.contactName}
-                  onChange={(e) =>
-                    handleInputChange("contactName", e.target.value)
-                  }
                   className="mt-2"
-                  required
+                  register={register}
                 />
               </div>
               <div>
                 <Label htmlFor="contactPhone">Téléphone</Label>
                 <Input
-                  id="contactPhone"
+                  name="contactPhone"
+                  error={errors.contactPhone}
                   type="tel"
                   placeholder="06 12 34 56 78"
-                  value={formData.contactPhone}
-                  onChange={(e) =>
-                    handleInputChange("contactPhone", e.target.value)
-                  }
                   className="mt-2"
-                  required
+                  register={register}
                 />
               </div>
               <div>
                 <Label htmlFor="contactEmail">Email</Label>
                 <Input
-                  id="contactEmail"
+                  name="contactEmail"
+                  error={errors.contactEmail}
                   type="email"
                   placeholder="jean@example.com"
-                  value={formData.contactEmail}
-                  onChange={(e) =>
-                    handleInputChange("contactEmail", e.target.value)
-                  }
                   className="mt-2"
-                  required
+                  register={register}
                 />
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="grid mt-6">
               <Label htmlFor="additionalNotes">Notes additionnelles</Label>
               <Textarea
                 id="additionalNotes"
+                error={errors.additionalNotes}
                 placeholder="Informations complémentaires..."
-                value={formData.additionalNotes}
-                onChange={(e) =>
-                  handleInputChange("additionalNotes", e.target.value)
-                }
+                name="additionalNotes"
                 className="mt-2"
+                register={register}
                 rows={2}
               />
             </div>
