@@ -17,6 +17,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
+      <link
+        href="https://api.fontshare.com/v2/css?f[]=satoshi@700&display=swap"
+        rel="stylesheet"
+      />
+
       <body>
         <TooltipProvider>
           {children}
