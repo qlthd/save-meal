@@ -25,10 +25,11 @@ import Link from "next/link";
 import { LoginModal } from "@/web/components/LoginModal";
 import { Prisma } from "@/backend/generated/prisma";
 import { z, ZodType } from "zod";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import FoodDonationCreateInput = Prisma.FoodDonationCreateInput;
+import { FoodDonationApi } from "@/web/api-client/src";
 
 const FoodDonationSchema = z
   .object({
@@ -55,13 +56,13 @@ const FoodDonationSchema = z
       .regex(/^\d{2}:\d{2}$/, "Doit être au format HH:MM"),
     scheduledDate: z.string().optional(),
     scheduledTime: z.string().optional(),
-    dietaryInfo: z.object({
-      vegetarian: z.boolean().optional(),
-      vegan: z.boolean().optional(),
-      glutenFree: z.boolean().optional(),
-      halal: z.boolean().optional(),
-      kosher: z.boolean().optional(),
-    }),
+    // dietaryInfo: z.object({
+    //   vegetarian: z.boolean().optional(),
+    //   vegan: z.boolean().optional(),
+    //   glutenFree: z.boolean().optional(),
+    //   halal: z.boolean().optional(),
+    //   kosher: z.boolean().optional(),
+    // }),
     additionalNotes: z.string().optional(),
   })
   .refine((data) => data.donationType !== "now" || !!data.scheduledDate, {
@@ -81,13 +82,6 @@ export default function DonnerPage() {
     resolver: zodResolver(FoodDonationSchema),
   });
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const handleDietaryChange = (dietary: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
@@ -98,11 +92,47 @@ export default function DonnerPage() {
     }));
   };
 
-  const onSubmit = (data: FoodDonationCreateInput) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Donation created:", { ...formData, type: donationType });
-    alert("Donation créée avec succès ! Une association sera notifiée.");
+  const onSubmit: SubmitHandler<FoodDonationCreateInput> = (data) => {
+    console.log("Form data submitted:", data);
+    const api = new FoodDonationApi();
+    api
+      .create({
+        createFoodDonationDto: {
+          title: data.title,
+          description: data.description,
+          foodType: data.foodType,
+          estimatedPortions: Number(data.estimatedPortions),
+          pickupPlace: data.pickupPlace,
+          address: data.address,
+          pickupInstructions: data.pickupInstructions || "",
+          availableFrom: data.availableFrom as string,
+          availableTo: data.availableTo as string,
+          contactName: data.contactName,
+          contactPhone: data.contactPhone,
+          contactEmail: data.contactEmail,
+          additionalNotes: data.additionalNotes ?? "",
+          // dietaryInfo: {
+          //   vegetarian: data.dietaryInfo.vegetarian || false,
+          //   vegan: data.dietaryInfo.vegan || false,
+          //   glutenFree: data.dietaryInfo.glutenFree || false,
+          //   halal: data.dietaryInfo.halal || false,
+          //   kosher: data.dietaryInfo.kosher || false,
+          // },
+        },
+      })
+      .then(() => {
+        // Handle success, e.g., show a success message or redirect
+        alert("Collecte créée avec succès !");
+      })
+      .catch((error) => {
+        // Handle error, e.g., show an error message
+        console.error("Erreur lors de la création de la collecte :", error);
+        setError("root", {
+          type: "manual",
+          message:
+            "Une erreur est survenue lors de la création de la collecte.",
+        });
+      });
   };
 
   return (
@@ -160,7 +190,7 @@ export default function DonnerPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Créer un don alimentaire
+            Créer une collecte de restes alimentaires
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Partagez vos surplus alimentaires avec des associations locales et
@@ -237,6 +267,7 @@ export default function DonnerPage() {
               <div>
                 <Label htmlFor="title">Titre du don</Label>
                 <Input
+                  type="text"
                   name="title"
                   error={errors.title}
                   placeholder="Ex: Surplus de buffet d'entreprise"
@@ -247,6 +278,7 @@ export default function DonnerPage() {
               <div>
                 <Label htmlFor="foodType">Type de nourriture</Label>
                 <Input
+                  type="text"
                   name="foodType"
                   error={errors.foodType}
                   placeholder="Ex: Plats chauds, sandwichs, desserts..."
@@ -325,6 +357,7 @@ export default function DonnerPage() {
               <div>
                 <Label htmlFor="location">Nom du lieu</Label>
                 <Input
+                  type="text"
                   name="location"
                   error={errors.location}
                   placeholder="Ex: Restaurant Le Gourmet"
@@ -335,6 +368,7 @@ export default function DonnerPage() {
               <div>
                 <Label htmlFor="address">Adresse complète</Label>
                 <Input
+                  type="text"
                   name="address"
                   error={errors.address}
                   placeholder="123 Rue de la Paix, 75001 Paris"
@@ -372,7 +406,6 @@ export default function DonnerPage() {
                 <div>
                   <Label htmlFor="availableTo">Disponible jusqu'à</Label>
                   <Input
-                    id="availableTo"
                     name="availableTo"
                     error={errors.availableTo}
                     type="time"
@@ -496,7 +529,7 @@ export default function DonnerPage() {
               </div>
             </div>
           </Card>
-
+          {JSON.stringify(errors, null, 2)}
           {/* Submit Button */}
           <div className="flex justify-center pt-6">
             <Button
