@@ -13,8 +13,8 @@ export class FoodDonationService {
     });
   }
 
-  findAll() {
-    return `This action returns all foodDonation`;
+  async findAll() {
+    return this.prisma.foodDonation.findMany();
   }
 
   findOne(id: number) {

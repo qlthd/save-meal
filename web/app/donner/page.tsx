@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/web/components/ui/button";
 import { Card } from "@/web/components/ui/card";
 import { Input } from "@/web/components/ui/input";
@@ -15,11 +15,9 @@ import {
   Clock,
   MapPin,
   Users,
-  Phone,
-  Mail,
   Calendar,
   CheckCircle,
-  AlertCircle,
+  TrashIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { LoginModal } from "@/web/components/LoginModal";
@@ -27,9 +25,10 @@ import { Prisma } from "@/backend/generated/prisma";
 import { z, ZodType } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import { useRouter } from "next/navigation";
 import FoodDonationCreateInput = Prisma.FoodDonationCreateInput;
-import { FoodDonationApi } from "@/web/api-client/src";
+import { Configuration, FoodDonationApi } from "@/web/api-client/src";
 
 const FoodDonationSchema = z
   .object({
@@ -40,7 +39,7 @@ const FoodDonationSchema = z
       .string()
       .min(1, "Le nombre de portions est requis")
       .regex(/^\d+$/, "Doit être un nombre entier"),
-    location: z.string().min(1, "Le nom du lieu est requis"),
+    pickupPlace: z.string().min(1, "Le nom du lieu est requis"),
     address: z.string().min(1, "L'adresse est requise"),
     pickupInstructions: z.string().optional(),
     contactName: z.string().min(1, "Le nom de contact est requis"),
@@ -49,13 +48,12 @@ const FoodDonationSchema = z
       .min(1, "Le téléphone de contact est requis")
       .regex(/^\d+$/, "Doit être un numéro de téléphone valide"),
     contactEmail: z.string().email("Doit être une adresse email valide"),
-    availableFrom: z.string().optional(),
-    availableTo: z
+    startDate: z.string().optional(),
+    startTime: z.string().optional(),
+    endTime: z
       .string()
       .min(1, "L'heure de disponibilité est requise")
       .regex(/^\d{2}:\d{2}$/, "Doit être au format HH:MM"),
-    scheduledDate: z.string().optional(),
-    scheduledTime: z.string().optional(),
     // dietaryInfo: z.object({
     //   vegetarian: z.boolean().optional(),
     //   vegan: z.boolean().optional(),
@@ -65,20 +63,62 @@ const FoodDonationSchema = z
     // }),
     additionalNotes: z.string().optional(),
   })
-  .refine((data) => data.donationType !== "now" || !!data.scheduledDate, {
+  .refine((data) => data.donationType !== "now" || !!data.startDate, {
     message: "La date prévue est requise si le don est disponible maintenant.",
-    path: ["scheduledDate"],
+    path: ["startDate"],
   });
 
+export type FoodDonationFormValue = {
+  title: string;
+  foodType: string;
+  estimatedPortions: number;
+  description: string;
+  pickupPlace: string;
+  address: string;
+  pickupInstructions: string;
+  startDate?: Date | string;
+  startTime?: string;
+  endDate: Date | string;
+  endTime: string;
+  contactName: string;
+  contactPhone: string;
+  contactEmail: string;
+  additionalNotes?: string | null;
+};
+
 export default function DonnerPage() {
+  const router = useRouter();
   const [donationType, setDonationType] = useState<"now" | "later">("now");
+  const [images, setImages] = useState([]);
+  const fileInputRef = useRef(null);
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    const newImages = files.map((file) => ({
+      id: URL.createObjectURL(file),
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+
+    setImages((prev) => [...prev, ...newImages]);
+    e.target.value = ""; // allow re-selecting the same file
+  };
+
+  const handleRemove = (id) => {
+    setImages((prev) => prev.filter((img) => img.id !== id));
+    URL.revokeObjectURL(id);
+  };
+  const openFilePicker = () => {
+    fileInputRef.current?.click();
+  };
+
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<FoodDonationCreateInput>({
+  } = useForm<FoodDonationFormValue>({
     resolver: zodResolver(FoodDonationSchema),
   });
 
@@ -92,9 +132,20 @@ export default function DonnerPage() {
     }));
   };
 
-  const onSubmit: SubmitHandler<FoodDonationCreateInput> = (data) => {
-    console.log("Form data submitted:", data);
-    const api = new FoodDonationApi();
+  const getDateWithCustomTime = (time: string, date?: Date) => {
+    const resultDate = date ?? new Date();
+    const [hours, minutes] = time.split(":").map(Number);
+    resultDate.setHours(hours, minutes, 0, 0);
+    return resultDate.toISOString();
+  };
+
+  const onSubmit: SubmitHandler<FoodDonationFormValue> = (data) => {
+    const api = new FoodDonationApi(
+      new Configuration({
+        basePath:
+          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3003",
+      }),
+    );
     api
       .create({
         createFoodDonationDto: {
@@ -105,8 +156,14 @@ export default function DonnerPage() {
           pickupPlace: data.pickupPlace,
           address: data.address,
           pickupInstructions: data.pickupInstructions || "",
-          availableFrom: data.availableFrom as string,
-          availableTo: data.availableTo as string,
+          availableFrom:
+            donationType === "now"
+              ? new Date().toISOString()
+              : getDateWithCustomTime(
+                  data.startTime || "",
+                  new Date(data.startDate),
+                ),
+          availableTo: getDateWithCustomTime(data.endTime),
           contactName: data.contactName,
           contactPhone: data.contactPhone,
           contactEmail: data.contactEmail,
@@ -123,6 +180,7 @@ export default function DonnerPage() {
       .then(() => {
         // Handle success, e.g., show a success message or redirect
         alert("Collecte créée avec succès !");
+        router.push("/mes-donations");
       })
       .catch((error) => {
         // Handle error, e.g., show an error message
@@ -343,6 +401,52 @@ export default function DonnerPage() {
                 ))}
               </div>
             </div>
+            <div className="mt-6">
+              <Label>Photos</Label>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={openFilePicker}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Charger des images
+                </button>
+                <span className="text-gray-600">
+                  {images.length > 0
+                    ? `${images.length} image${images.length > 1 ? "s" : ""} sélectionnée${images.length > 1 ? "s" : ""}`
+                    : "Pas d'images sélectionnées"}
+                </span>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </div>
+
+              <PhotoProvider>
+                <div className="grid grid-cols-3 gap-4">
+                  {images.map((img) => (
+                    <div key={img.id} className="relative group">
+                      <PhotoView src={img.preview}>
+                        <img
+                          src={img.preview}
+                          alt="preview"
+                          className="rounded-lg shadow cursor-pointer"
+                        />
+                      </PhotoView>
+                      <button
+                        onClick={() => handleRemove(img.id)}
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 text-xs opacity-80 hover:opacity-100"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </PhotoProvider>
+            </div>
           </Card>
 
           {/* Location */}
@@ -358,8 +462,8 @@ export default function DonnerPage() {
                 <Label htmlFor="location">Nom du lieu</Label>
                 <Input
                   type="text"
-                  name="location"
-                  error={errors.location}
+                  name="pickupPlace"
+                  error={errors.pickupPlace}
                   placeholder="Ex: Restaurant Le Gourmet"
                   register={register}
                   className="mt-2"
@@ -404,10 +508,10 @@ export default function DonnerPage() {
             {donationType === "now" ? (
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="availableTo">Disponible jusqu'à</Label>
+                  <Label htmlFor="endTime">Heure de fin</Label>
                   <Input
-                    name="availableTo"
-                    error={errors.availableTo}
+                    name="endTime"
+                    error={errors.endTime}
                     type="time"
                     register={register}
                     className="mt-2"
@@ -417,30 +521,30 @@ export default function DonnerPage() {
             ) : (
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="scheduledDate">Date prévue</Label>
+                  <Label htmlFor="startDate">Date prévue</Label>
                   <Input
-                    name="scheduledDate"
-                    error={errors.scheduledDate}
+                    name="startDate"
+                    error={errors.startDate}
                     type="date"
                     register={register}
                     className="mt-2"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="scheduledTime">Heure prévue</Label>
+                  <Label htmlFor="startTime">Heure prévue</Label>
                   <Input
-                    name="scheduledTime"
-                    error={errors.availableFrom}
+                    name="startTime"
+                    error={errors.startTime}
                     type="time"
                     register={register}
                     className="mt-2"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="availableUntil">Disponible jusqu'à</Label>
+                  <Label htmlFor="endTime">Disponible jusqu'à</Label>
                   <Input
-                    name="availableTo"
-                    error={errors.availableTo}
+                    name="endTime"
+                    error={errors.endTime}
                     type="time"
                     register={register}
                     className="mt-2"
@@ -529,7 +633,6 @@ export default function DonnerPage() {
               </div>
             </div>
           </Card>
-          {JSON.stringify(errors, null, 2)}
           {/* Submit Button */}
           <div className="flex justify-center pt-6">
             <Button

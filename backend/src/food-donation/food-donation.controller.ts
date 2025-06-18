@@ -10,8 +10,14 @@ import {
 import { FoodDonationService } from './food-donation.service';
 import { UpdateFoodDonationDto } from './dto/update-food-donation.dto';
 import { Prisma } from 'generated/prisma';
-import { ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { CreateFoodDonationDto } from './dto/create-food-donation.dto';
+import { FoodDonation } from './entities/food-donation.entity';
 
 @Controller('food-donation')
 export class FoodDonationController {
@@ -22,11 +28,16 @@ export class FoodDonationController {
   @ApiBody({ type: CreateFoodDonationDto })
   @ApiResponse({ status: 201, description: 'Collecte créé.' })
   create(@Body() createFoodDonationDto: Prisma.FoodDonationCreateInput) {
-    console.log(createFoodDonationDto);
     return this.foodDonationService.create(createFoodDonationDto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Récupérer toutes les collectes' })
+  @ApiOkResponse({
+    description: 'The user records',
+    type: CreateFoodDonationDto,
+    isArray: true,
+  })
   findAll() {
     return this.foodDonationService.findAll();
   }

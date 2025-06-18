@@ -80,8 +80,9 @@ export class FoodDonationApi extends runtime.BaseAPI {
     }
 
     /**
+     * Récupérer toutes les collectes
      */
-    async findAllRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async findAllRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CreateFoodDonationDto>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -93,13 +94,15 @@ export class FoodDonationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CreateFoodDonationDtoFromJSON));
     }
 
     /**
+     * Récupérer toutes les collectes
      */
-    async findAll(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.findAllRaw(initOverrides);
+    async findAll(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CreateFoodDonationDto>> {
+        const response = await this.findAllRaw(initOverrides);
+        return await response.value();
     }
 
     /**

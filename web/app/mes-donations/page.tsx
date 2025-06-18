@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/web/components/ui/button";
 import { Card } from "@/web/components/ui/card";
 import { Badge } from "@/web/components/ui/badge";
@@ -25,6 +25,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { LoginModal } from "@/web/components/LoginModal";
+import {
+  Configuration,
+  type CreateFoodDonationDto,
+  FoodDonationApi,
+} from "@/web/api-client/src";
 
 // Mock data for user donations
 const mockPastDonations = [
@@ -97,6 +102,21 @@ export default function MesDonationsPage() {
   const [pastCollapsed, setPastCollapsed] = useState(true);
   const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [collectes, setCollectes] = useState<CreateFoodDonationDto[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const api = new FoodDonationApi(
+        new Configuration({
+          basePath:
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3003",
+        }),
+      );
+      const fetched = await api.findAll();
+      console.log("fetched:", fetched);
+      setCollectes(fetched);
+    };
+    fetchData();
+  }, []);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
