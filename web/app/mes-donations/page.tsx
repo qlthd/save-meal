@@ -11,7 +11,6 @@ import {
 } from "@/web/components/ui/collapsible";
 import {
   ChefHat,
-  ArrowLeft,
   Calendar,
   MapPin,
   Users,
@@ -21,89 +20,20 @@ import {
   CheckCircle,
   AlertCircle,
   Edit,
-  Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { LoginModal } from "@/web/components/LoginModal";
+import { Header } from "@/web/components/Header/Header";
 import {
   Configuration,
-  FoodDonation,
   FoodDonationApi,
   FoodDonationListResponse,
 } from "@/web/api-client/src";
 
-// Mock data for user donations
-const mockPastDonations = [
-  {
-    id: 1,
-    title: "Surplus de fête d'entreprise",
-    description: "Buffet complet avec desserts",
-    portions: 45,
-    location: "14ème arrondissement, Paris",
-    date: "2024-01-15",
-    time: "18:00",
-    status: "Récupéré",
-    associationName: "Les Restos du Cœur",
-    createdAt: "2024-01-14",
-  },
-  {
-    id: 2,
-    title: "Mariage - Surplus traiteur",
-    description: "Plats chauds et accompagnements",
-    portions: 80,
-    location: "Neuilly-sur-Seine",
-    date: "2024-01-10",
-    time: "22:00",
-    status: "Récupéré",
-    associationName: "Emmaüs",
-    createdAt: "2024-01-09",
-  },
-  {
-    id: 3,
-    title: "Conférence tech - Snacks",
-    description: "Sandwichs et viennoiseries",
-    portions: 25,
-    location: "La Défense",
-    date: "2024-01-05",
-    time: "17:30",
-    status: "Expiré",
-    associationName: null,
-    createdAt: "2024-01-05",
-  },
-];
-
-const mockUpcomingDonations = [
-  {
-    id: 4,
-    title: "Événement d'inauguration",
-    description: "Canapés, boissons et petits fours",
-    portions: 60,
-    location: "8ème arrondissement, Paris",
-    date: "2024-01-25",
-    time: "19:00",
-    status: "Planifié",
-    associationName: null,
-    createdAt: "2024-01-20",
-  },
-  {
-    id: 5,
-    title: "Formation entreprise",
-    description: "Déjeuner d'affaires complet",
-    portions: 35,
-    location: "Boulogne-Billancourt",
-    date: "2024-01-22",
-    time: "14:00",
-    status: "Confirmé",
-    associationName: "Secours Populaire",
-    createdAt: "2024-01-18",
-  },
-];
-
 export default function MesDonationsPage() {
   const [pastCollapsed, setPastCollapsed] = useState(true);
   const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [collectes, setCollectes] = useState<FoodDonationListResponse>();
+
   useEffect(() => {
     const fetchData = async () => {
       const api = new FoodDonationApi(
@@ -167,47 +97,7 @@ export default function MesDonationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-
-      <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/web/public"
-              className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Retour</span>
-            </Link>
-            <div className="h-6 w-px bg-gray-300" />
-            <Link href="/web/public" className="flex items-center">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F65e64ef700ed4a1cb9ad3db72540f93c?format=webp&width=800"
-                alt="Save Meal Logo"
-                className="h-14 w-auto"
-              />
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLoginModalOpen(true)}
-            >
-              Se connecter
-            </Button>
-            <Badge
-              variant="secondary"
-              className="bg-purple-100 text-purple-800"
-            >
-              Mes donations
-            </Badge>
-          </div>
-        </div>
-      </nav>
-
-      {/* Login Modal */}
-      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
+      <Header />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

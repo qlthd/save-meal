@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/web/components/ui/button";
 import { Card } from "@/web/components/ui/card";
 import {
-  ChefHat,
   Users,
   Heart,
   ArrowRight,
@@ -13,46 +11,12 @@ import {
   Clock,
 } from "lucide-react";
 import Link from "next/link";
-import { LoginModal } from "@/web/components/LoginModal";
+import { Header } from "@/web/components/Header/Header";
 
 export default function HomePage() {
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-orange-50">
-      {/* Navigation */}
-      <nav className="w-full px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/web/public" className="flex items-center">
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F65e64ef700ed4a1cb9ad3db72540f93c?format=webp&width=800"
-              alt="Save Meal Logo"
-              className="h-14 w-auto"
-            />
-          </Link>
-          <div className="flex items-center space-x-4">
-            <Link href="/mes-donations">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-green-600"
-              >
-                Mes donations
-              </Button>
-            </Link>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLoginModalOpen(true)}
-            >
-              Se connecter
-            </Button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Login Modal */}
-      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
+      <Header isHomePage />
 
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -237,7 +201,10 @@ export default function HomePage() {
       <footer className="bg-gray-50 border-t border-gray-200 py-12 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <Link href="/web/public" className="flex items-center justify-center mb-4">
+            <Link
+              href="/web/public"
+              className="flex items-center justify-center mb-4"
+            >
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F65e64ef700ed4a1cb9ad3db72540f93c?format=webp&width=800"
                 alt="Save Meal Logo"

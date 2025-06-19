@@ -5,66 +5,12 @@ import { Button } from "@/web/components/ui/button";
 import { Card } from "@/web/components/ui/card";
 import { Input } from "@/web/components/ui/input";
 import { Badge } from "@/web/components/ui/badge";
-import {
-  ChefHat,
-  Search,
-  MapPin,
-  Clock,
-  Users,
-  ArrowLeft,
-  Phone,
-  Mail,
-} from "lucide-react";
-import Link from "next/link";
-import { LoginModal } from "@/web/components/LoginModal";
-
-// Mock data for food donations
-const mockDonations = [
-  {
-    id: 1,
-    title: "Surplus de mariage - Traiteur Dubois",
-    description: "50 portions de plats chauds, desserts et pain",
-    location: "15ème arrondissement, Paris",
-    distance: "1.2 km",
-    timeLeft: "2h30",
-    portions: 50,
-    type: "Événement privé",
-    contact: "Marie Dubois",
-    phone: "06 12 34 56 78",
-    status: "Disponible",
-  },
-  {
-    id: 2,
-    title: "Fin de marché - Boulangerie Martin",
-    description: "Viennoiseries, pains et sandwichs",
-    location: "7ème arrondissement, Paris",
-    distance: "2.8 km",
-    timeLeft: "45min",
-    portions: 30,
-    type: "Commerce",
-    contact: "Jean Martin",
-    phone: "06 87 65 43 21",
-    status: "Urgent",
-  },
-  {
-    id: 3,
-    title: "Événement d'entreprise - Tech Corp",
-    description: "Buffet complet pour 80 personnes",
-    location: "La Défense, Courbevoie",
-    distance: "5.1 km",
-    timeLeft: "4h15",
-    portions: 80,
-    type: "Événement d'entreprise",
-    contact: "Sophie Laurent",
-    phone: "06 45 12 78 96",
-    status: "Disponible",
-  },
-];
+import { Search, MapPin, Clock, Users, Phone, Mail } from "lucide-react";
+import { Header } from "@/web/components/Header/Header";
 
 export default function AssociationPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDonation, setSelectedDonation] = useState<number | null>(null);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   const filteredDonations = mockDonations.filter(
     (donation) =>
@@ -75,52 +21,7 @@ export default function AssociationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/web/public"
-              className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Retour</span>
-            </Link>
-            <div className="h-6 w-px bg-gray-300" />
-            <Link href="/web/public" className="flex items-center">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F65e64ef700ed4a1cb9ad3db72540f93c?format=webp&width=800"
-                alt="Save Meal Logo"
-                className="h-14 w-auto"
-              />
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/mes-donations">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-green-600"
-              >
-                Mes donations
-              </Button>
-            </Link>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLoginModalOpen(true)}
-            >
-              Se connecter
-            </Button>
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              Association
-            </Badge>
-          </div>
-        </div>
-      </nav>
-
-      {/* Login Modal */}
-      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
+      <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
