@@ -14,7 +14,11 @@ export class FoodDonationService {
   }
 
   async findAll() {
-    return this.prisma.foodDonation.findMany();
+    return this.prisma.foodDonation.findMany({
+      include: {
+        booking: true,
+      },
+    });
   }
 
   findOne(id: number) {

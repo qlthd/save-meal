@@ -27,8 +27,9 @@ import Link from "next/link";
 import { LoginModal } from "@/web/components/LoginModal";
 import {
   Configuration,
-  type CreateFoodDonationDto,
+  FoodDonation,
   FoodDonationApi,
+  FoodDonationListResponse,
 } from "@/web/api-client/src";
 
 // Mock data for user donations
@@ -102,13 +103,13 @@ export default function MesDonationsPage() {
   const [pastCollapsed, setPastCollapsed] = useState(true);
   const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [collectes, setCollectes] = useState<CreateFoodDonationDto[]>([]);
+  const [collectes, setCollectes] = useState<FoodDonationListResponse>();
   useEffect(() => {
     const fetchData = async () => {
       const api = new FoodDonationApi(
         new Configuration({
           basePath:
-            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3003",
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
         }),
       );
       const fetched = await api.findAll();
@@ -159,12 +160,15 @@ export default function MesDonationsPage() {
       year: "numeric",
       month: "long",
       day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
+
       <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -240,7 +244,7 @@ export default function MesDonationsPage() {
                       Donations passées
                     </h2>
                     <Badge variant="secondary" className="ml-2">
-                      {mockPastDonations.length}
+                      {collectes?.past.length}
                     </Badge>
                   </div>
                   <div className="text-sm text-gray-500">
@@ -251,7 +255,7 @@ export default function MesDonationsPage() {
               <CollapsibleContent>
                 <div className="border-t border-gray-200">
                   <div className="p-6 pt-4 space-y-4">
-                    {mockPastDonations.map((donation) => (
+                    {collectes?.past.map((donation) => (
                       <Card
                         key={donation.id}
                         className="p-4 border-l-4 border-l-gray-300"
@@ -315,7 +319,7 @@ export default function MesDonationsPage() {
                       Donations à venir
                     </h2>
                     <Badge className="ml-2 bg-green-100 text-green-800">
-                      {mockUpcomingDonations.length}
+                      {collectes?.upcoming.length}
                     </Badge>
                   </div>
                   <div className="text-sm text-gray-500">
@@ -326,9 +330,9 @@ export default function MesDonationsPage() {
               <CollapsibleContent>
                 <div className="border-t border-gray-200">
                   <div className="p-6 pt-4 space-y-4">
-                    {mockUpcomingDonations.map((donation) => (
+                    {collectes?.upcoming.map((donation) => (
                       <Card
-                        key={donation.id}
+                        key={donation.title}
                         className="p-4 border-l-4 border-l-green-500"
                       >
                         <div className="flex justify-between items-start mb-3">
@@ -336,7 +340,7 @@ export default function MesDonationsPage() {
                             {donation.title}
                           </h3>
                           <div className="flex items-center space-x-2">
-                            {getStatusBadge(donation.status)}
+                            {getStatusBadge("Expiré")}
                             <Button
                               size="sm"
                               variant="outline"
@@ -350,27 +354,29 @@ export default function MesDonationsPage() {
                         <p className="text-gray-600 mb-3">
                           {donation.description}
                         </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
+                        <div className="flex items-center text-sm text-gray-600 mb-3">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          <span>
+                            du {formatDate(donation.availableFrom)} au{" "}
+                            {formatDate(donation.availableTo)}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 mb-3">
                           <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-2" />
+                            <MapPin className="w-4 h-4 mr-2" />
                             <span>
-                              {formatDate(donation.date)} à {donation.time}
+                              {donation.pickupPlace} - {donation.address}
                             </span>
                           </div>
                           <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            <span>{donation.location}</span>
-                          </div>
-                          <div className="flex items-center">
                             <Users className="w-4 h-4 mr-2" />
-                            <span>{donation.portions} portions</span>
+                            <span>{donation.estimatedPortions} portions</span>
                           </div>
                         </div>
-                        {donation.associationName ? (
+                        {donation.booking ? (
                           <div className="p-3 bg-orange-50 rounded-lg">
                             <p className="text-sm text-orange-800">
-                              <strong>Association assignée:</strong>{" "}
-                              {donation.associationName}
+                              <strong>Réservé</strong>
                             </p>
                           </div>
                         ) : (

@@ -143,7 +143,7 @@ export default function DonnerPage() {
     const api = new FoodDonationApi(
       new Configuration({
         basePath:
-          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3003",
+          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
       }),
     );
     api
@@ -273,7 +273,7 @@ export default function DonnerPage() {
                 className="flex-1 cursor-pointer p-4 border-2 border-gray-200 rounded-lg hover:border-green-300 transition-colors"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <div className="w-14 h-10 bg-green-100 rounded-full flex items-center justify-center">
                     <Clock className="w-5 h-5 text-green-600" />
                   </div>
                   <div>

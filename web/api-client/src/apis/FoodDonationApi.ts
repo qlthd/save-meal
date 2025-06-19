@@ -16,10 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   CreateFoodDonationDto,
+  FoodDonationListResponse,
 } from '../models/index';
 import {
     CreateFoodDonationDtoFromJSON,
     CreateFoodDonationDtoToJSON,
+    FoodDonationListResponseFromJSON,
+    FoodDonationListResponseToJSON,
 } from '../models/index';
 
 export interface CreateRequest {
@@ -82,7 +85,7 @@ export class FoodDonationApi extends runtime.BaseAPI {
     /**
      * Récupérer toutes les collectes
      */
-    async findAllRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CreateFoodDonationDto>>> {
+    async findAllRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FoodDonationListResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -94,13 +97,13 @@ export class FoodDonationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CreateFoodDonationDtoFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => FoodDonationListResponseFromJSON(jsonValue));
     }
 
     /**
      * Récupérer toutes les collectes
      */
-    async findAll(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CreateFoodDonationDto>> {
+    async findAll(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FoodDonationListResponse> {
         const response = await this.findAllRaw(initOverrides);
         return await response.value();
     }

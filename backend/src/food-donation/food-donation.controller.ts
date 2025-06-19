@@ -18,6 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateFoodDonationDto } from './dto/create-food-donation.dto';
 import { FoodDonation } from './entities/food-donation.entity';
+import { FoodDonationListResponse } from './dto/FoodDonationListResponse';
 
 @Controller('food-donation')
 export class FoodDonationController {
@@ -34,12 +35,16 @@ export class FoodDonationController {
   @Get()
   @ApiOperation({ summary: 'Récupérer toutes les collectes' })
   @ApiOkResponse({
-    description: 'The user records',
-    type: CreateFoodDonationDto,
-    isArray: true,
+    description: 'Past and upcoming food donations',
+    type: FoodDonationListResponse,
   })
-  findAll() {
-    return this.foodDonationService.findAll();
+  async findAll(): FoodDonationListResponse {
+    const collectes = await this.foodDonationService.findAll();
+    const response: FoodDonationListResponse = {
+      past: collectes.filter((c) => c.availableTo < new Date()),
+      upcoming: collectes.filter((c) => c.availableTo >= new Date()),
+    };
+    return response;
   }
 
   @Get(':id')
