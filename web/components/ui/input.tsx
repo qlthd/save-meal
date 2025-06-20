@@ -11,6 +11,7 @@ type InputProps = {
   error: FieldError | undefined;
   className?: string;
   valueAsNumber?: boolean;
+  disabled?: boolean;
 };
 
 const Input = (props: InputProps) => {
@@ -22,11 +23,13 @@ const Input = (props: InputProps) => {
     error,
     valueAsNumber,
     className,
+    disabled,
     ...rest
   } = props;
   return (
     <>
       <input
+        disabled={disabled}
         type={type}
         placeholder={placeholder}
         className={cn(
@@ -34,7 +37,7 @@ const Input = (props: InputProps) => {
           className,
         )}
         {...register(name, { valueAsNumber })}
-      />
+      ></input>
       {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
     </>
   );

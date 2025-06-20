@@ -287,24 +287,23 @@ export default function MesDonationsPage() {
         </div>
 
         {/* Empty state if no donations */}
-        {mockPastDonations.length === 0 &&
-          mockUpcomingDonations.length === 0 && (
-            <Card className="p-12 text-center">
-              <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Aucune donation pour le moment
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Commencez par créer votre première donation pour partager vos
-                surplus alimentaires
-              </p>
-              <Link href="/donner">
-                <Button className="bg-green-600 hover:bg-green-700 text-white">
-                  Créer ma première donation
-                </Button>
-              </Link>
-            </Card>
-          )}
+        {collectes?.upcoming.length === 0 && collectes.past.length === 0 && (
+          <Card className="p-12 text-center">
+            <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Aucune donation pour le moment
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Commencez par créer votre première donation pour partager vos
+              surplus alimentaires
+            </p>
+            <Link href="/donner">
+              <Button className="bg-green-600 hover:bg-green-700 text-white">
+                Créer ma première donation
+              </Button>
+            </Link>
+          </Card>
+        )}
       </div>
     </div>
   );

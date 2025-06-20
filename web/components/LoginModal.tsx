@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/web/components/ui/button";
 import { Input } from "@/web/components/ui/input";
 import { Label } from "@/web/components/ui/label";
@@ -22,63 +22,85 @@ import {
   Facebook,
   Github,
 } from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FoodDonationFormValue } from "@/web/app/donner/page";
+import { z } from "zod";
+import { ForgotPasswordModal } from "@/web/components/ForgotPasswordModal/ForgotPasswordModal";
 
 interface LoginModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+export type LoginFormValue = {
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+  firstName: string;
+  lastName: string;
+  mode: "login" | "register";
+};
+
+const LoginSchema = z
+  .object({
+    email: z.string().email("Doit être une adresse email valide"),
+    password: z
+      .string()
+      .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+    passwordConfirmation: z.string().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    mode: z.enum(["login", "register"]).default("login"),
+  })
+  .refine((data) => data.mode !== "register" || !!data.firstName, {
+    message: "Le prénom est requis",
+    path: ["firstName"],
+  })
+  .refine((data) => data.mode !== "register" || !!data.lastName, {
+    message: "Le nom est requis",
+    path: ["lastName"],
+  })
+  .refine((data) => data.mode !== "register" || !!data.password, {
+    message: "Un mot de passe est requis",
+    path: ["password"],
+  })
+  .refine((data) => data.mode !== "register" || !!data.passwordConfirmation, {
+    message: "La confirmation du mot de passe est requise",
+    path: ["passwordConfirmation"],
+  })
+  .refine(
+    (data) =>
+      data.mode !== "register" || data.password === data.passwordConfirmation,
+    {
+      message: "Les mots de passe ne correspondent pas",
+      path: ["passwordConfirmation"],
+    },
+  );
+
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
-  const [mode, setMode] = useState<"login" | "register">("login");
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    control,
+  } = useForm<LoginFormValue>({
+    resolver: zodResolver(LoginSchema),
   });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (mode === "login") {
-      // Handle login
-      console.log("Login:", {
-        email: formData.email,
-        password: formData.password,
-      });
-    } else {
-      // Handle registration
-      console.log("Register:", formData);
-    }
-    // Close modal on success
-    onOpenChange(false);
-  };
-
-  const handleSocialLogin = (provider: string) => {
-    console.log(`Login with ${provider}`);
-    // Handle social login
-    onOpenChange(false);
+  const mode = useWatch({ control, name: "mode", defaultValue: "login" });
+  const onSubmit = (data: LoginFormValue) => {};
+  const handleForgotPassword = () => {
+    setForgotPasswordOpen(true);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md overflow-y-auto max-h-screen">
         <DialogHeader className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F65e64ef700ed4a1cb9ad3db72540f93c?format=webp&width=800"
-              alt="Save Meal Logo"
-              className="h-16 w-auto"
-            />
-          </div>
           <DialogTitle className="text-2xl font-bold text-gray-900">
             {mode === "login" ? "Se connecter" : "Créer un compte"}
           </DialogTitle>
@@ -95,7 +117,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             <Button
               variant="outline"
               className="w-full justify-start relative"
-              onClick={() => handleSocialLogin("google")}
+              // onClick={() => handleSocialLogin("google")}
             >
               <Chrome className="w-5 h-5 mr-3 text-blue-600" />
               Continuer avec Google
@@ -103,7 +125,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             <Button
               variant="outline"
               className="w-full justify-start relative"
-              onClick={() => handleSocialLogin("facebook")}
+              // onClick={() => handleSocialLogin("facebook")}
             >
               <Facebook className="w-5 h-5 mr-3 text-blue-700" />
               Continuer avec Facebook
@@ -118,38 +140,34 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
           </div>
 
           {/* Email/Password Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {mode === "register" && (
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="firstName">Prénom</Label>
                   <div className="relative mt-1">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <User className="absolute left-2 top-3 text-gray-400 w-4 h-4" />
                     <Input
-                      id="firstName"
+                      type="text"
+                      name="firstName"
                       placeholder="Jean"
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        handleInputChange("firstName", e.target.value)
-                      }
+                      error={errors.firstName}
+                      register={register}
                       className="pl-10"
-                      required
                     />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="lastName">Nom</Label>
                   <div className="relative mt-1">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <User className="absolute left-2 top-3 text-gray-400 w-4 h-4" />
                     <Input
-                      id="lastName"
+                      type="text"
+                      name="lastName"
                       placeholder="Dupont"
-                      value={formData.lastName}
-                      onChange={(e) =>
-                        handleInputChange("lastName", e.target.value)
-                      }
+                      error={errors.lastName}
+                      register={register}
                       className="pl-10"
-                      required
                     />
                   </div>
                 </div>
@@ -159,15 +177,14 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             <div>
               <Label htmlFor="email">Email</Label>
               <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Mail className="absolute left-2 top-3 text-gray-400 w-4 h-4" />
                 <Input
-                  id="email"
+                  name="email"
                   type="email"
                   placeholder="jean@example.com"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  error={errors.email}
+                  register={register}
                   className="pl-10"
-                  required
                 />
               </div>
             </div>
@@ -175,22 +192,18 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             <div>
               <Label htmlFor="password">Mot de passe</Label>
               <div className="relative mt-1">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) =>
-                    handleInputChange("password", e.target.value)
-                  }
+                  error={errors.password}
+                  register={register}
                   className="pl-10 pr-10"
-                  required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute left-2 top-3 text-gray-400 hover:text-gray-600"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -207,17 +220,14 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   Confirmer le mot de passe
                 </Label>
                 <div className="relative mt-1">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Lock className="absolute left-2 top-3 text-gray-400 w-4 h-4" />
                   <Input
-                    id="confirmPassword"
+                    name="passwordConfirmation"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      handleInputChange("confirmPassword", e.target.value)
-                    }
+                    error={errors.passwordConfirmation}
+                    register={register}
                     className="pl-10"
-                    required
                   />
                 </div>
               </div>
@@ -227,6 +237,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
               <div className="text-right">
                 <button
                   type="button"
+                  onClick={handleForgotPassword}
                   className="text-sm text-green-600 hover:text-green-700 hover:underline"
                 >
                   Mot de passe oublié ?
@@ -249,7 +260,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 Pas encore de compte ?{" "}
                 <button
                   type="button"
-                  onClick={() => setMode("register")}
+                  onClick={() => setValue("mode", "register")}
                   className="text-green-600 hover:text-green-700 font-medium hover:underline"
                 >
                   Créer un compte
@@ -260,7 +271,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 Déjà un compte ?{" "}
                 <button
                   type="button"
-                  onClick={() => setMode("login")}
+                  onClick={() => setValue("mode", "login")}
                   className="text-green-600 hover:text-green-700 font-medium hover:underline"
                 >
                   Se connecter
@@ -284,6 +295,11 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
           )}
         </div>
       </DialogContent>
+      <ForgotPasswordModal
+        open={forgotPasswordOpen}
+        onOpenChange={setForgotPasswordOpen}
+        onBackToLogin={() => {}}
+      />
     </Dialog>
   );
 }
