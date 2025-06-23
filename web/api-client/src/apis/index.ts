@@ -4,3 +4,4 @@ export * from './AppApi';
 export * from './AssociationApi';
 export * from './BookingApi';
 export * from './FoodDonationApi';
+export * from './UserApi';

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages";
 import Association from "./pages/Association";
 import NotFound from "./pages/NotFound";
+import { SessionProvider } from "next-auth/react";
 
 const queryClient = new QueryClient();
 

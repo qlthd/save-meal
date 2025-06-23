@@ -48,5 +48,5 @@ export class FoodDonation {
   updatedAt?: string;
 
   @ApiProperty({ required: false, nullable: true })
-  booking: Booking;
+  booking?: Booking;
 }

@@ -38,11 +38,13 @@ export class FoodDonationController {
     description: 'Past and upcoming food donations',
     type: FoodDonationListResponse,
   })
-  async findAll(): FoodDonationListResponse {
+  async findAll(): Promise<FoodDonationListResponse> {
     const collectes = await this.foodDonationService.findAll();
     const response: FoodDonationListResponse = {
-      past: collectes.filter((c) => c.availableTo < new Date()),
-      upcoming: collectes.filter((c) => c.availableTo >= new Date()),
+      past: collectes.filter((c) => c.availableTo < new Date().toISOString()),
+      upcoming: collectes.filter(
+        (c) => c.availableTo >= new Date().toISOString(),
+      ),
     };
     return response;
   }

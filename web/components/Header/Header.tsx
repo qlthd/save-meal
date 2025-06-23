@@ -5,11 +5,26 @@ import { Badge } from "@/web/components/ui/badge";
 import { useState } from "react";
 import { LoginModal } from "../LoginModal";
 import { HeaderProps } from "./Header.types";
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
 
 export const Header = (props: HeaderProps) => {
   const { isHomePage } = props;
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const { data: session, status } = useSession();
 
+  const onLogout = async () => {
+    try {
+      await signOut({
+        callbackUrl: "/",
+        redirect: true,
+      });
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+    toast.success("Déconnexion réussie !");
+  };
   return (
     <>
       <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
@@ -36,13 +51,21 @@ export const Header = (props: HeaderProps) => {
             </Link>
           </div>
           <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLoginModalOpen(true)}
-            >
-              Se connecter
-            </Button>
+            {status === "unauthenticated" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLoginModalOpen(true)}
+              >
+                Se connecter
+              </Button>
+            )}
+            {status === "authenticated" && (
+              <Button variant="outline" size="sm" onClick={onLogout}>
+                Déconnexion
+              </Button>
+            )}
+
             <Badge
               variant="secondary"
               className="bg-purple-100 text-purple-800"
@@ -54,6 +77,7 @@ export const Header = (props: HeaderProps) => {
       </nav>
       {/* Login Modal */}
       <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
+      <Toaster />
     </>
   );
 };

@@ -1,14 +1,10 @@
+"use client";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/web/components/ui/toaster";
 import { Toaster as Sonner } from "@/web/components/ui/sonner";
 import { TooltipProvider } from "@/web/components/ui/tooltip";
-
-export const metadata: Metadata = {
-  title: "Save Meal - Transformons les surplus alimentaires en solidarité",
-  description:
-    "Connectons les organisateurs d'événements aux associations pour que chaque repas trouve sa place. Lutte contre le gaspillage alimentaire.",
-};
+import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({
   children,
@@ -23,11 +19,13 @@ export default function RootLayout({
       />
 
       <body>
-        <TooltipProvider>
-          {children}
-          <Toaster />
-          <Sonner />
-        </TooltipProvider>
+        <SessionProvider>
+          <TooltipProvider>
+            {children}
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </SessionProvider>
       </body>
     </html>
   );
