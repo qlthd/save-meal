@@ -82,6 +82,7 @@ const LoginSchema = z
 
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   const {
@@ -109,8 +110,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
         toast.success("Connexion réussie !");
         onOpenChange(false);
       } else {
-        alert(`Failed to sign in`);
-        // setError("Email ou mot de passe invalide");
+        setError("Email ou mot de passe invalide");
       }
     } else {
       const firstName = data.firstName;
@@ -282,7 +282,9 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   </div>
                 </div>
               )}
-
+              {error && (
+                <p className="text-red-500 text-sm text-center mt-2">{error}</p>
+              )}
               {mode === "login" && (
                 <div className="text-right">
                   <button
