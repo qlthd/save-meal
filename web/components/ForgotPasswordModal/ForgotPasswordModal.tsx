@@ -29,12 +29,11 @@ export function ForgotPasswordModal({
   onOpenChange,
   onBackToLogin,
 }: ForgotPasswordModalProps) {
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting, isSubmitted },
+    getValues,
     setValue,
     control,
   } = useForm<PasswordForgottenFormValues>({
@@ -42,18 +41,11 @@ export function ForgotPasswordModal({
   });
 
   const onSubmit = async (data: PasswordForgottenFormValues) => {
-    setIsLoading(true);
-
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setIsLoading(false);
-    setIsSubmitted(true);
   };
 
   const handleClose = () => {
-    setIsSubmitted(false);
-    setIsLoading(false);
     onOpenChange(false);
   };
 
@@ -96,7 +88,9 @@ export function ForgotPasswordModal({
                 <p className="text-gray-900 font-medium">
                   Un email a été envoyé à :
                 </p>
-                <p className="text-green-600 font-semibold">{email}</p>
+                <p className="text-green-600 font-semibold">
+                  {getValues().email}
+                </p>
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg text-left">
@@ -134,7 +128,7 @@ export function ForgotPasswordModal({
                     error={errors.email}
                     className="pl-10"
                     register={register}
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -142,9 +136,9 @@ export function ForgotPasswordModal({
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-green-600 to-orange-500 hover:from-green-700 hover:to-orange-600 text-white"
-                disabled={isLoading}
+                disabled={isSubmitting}
               >
-                {isLoading ? (
+                {isSubmitting ? (
                   <div className="flex items-center">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     Envoi en cours...
