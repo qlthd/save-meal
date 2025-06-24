@@ -88,7 +88,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     setValue,
     control,
   } = useForm<LoginFormValue>({
@@ -133,10 +133,11 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             password,
           },
         });
-        setValue(mode, "login");
+        toast.success("Compte créé avec succès !");
+        setValue("mode", "login");
       } catch (error) {
         console.error("Error creating user:", error);
-        alert("Erreur lors de la création du compte. Veuillez réessayer.");
+        setError("Erreur lors de la création du compte. Veuillez réessayer.");
         return;
       }
     }
@@ -145,6 +146,10 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const handleForgotPassword = () => {
     setForgotPasswordOpen(true);
   };
+
+  useEffect(() => {
+    setError("");
+  }, [mode]);
 
   return (
     <>
@@ -299,6 +304,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-green-600 to-orange-500 hover:from-green-700 hover:to-orange-600 text-white"
               >
                 {mode === "login" ? "Se connecter" : "Créer mon compte"}
