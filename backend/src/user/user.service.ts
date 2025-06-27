@@ -25,6 +25,8 @@ export class UserService {
         email: true,
         firstName: true,
         lastName: true,
+        corporateName: true,
+        type: true,
       },
     });
   }

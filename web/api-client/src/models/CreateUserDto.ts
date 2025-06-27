@@ -24,13 +24,25 @@ export interface CreateUserDto {
      * @type {string}
      * @memberof CreateUserDto
      */
-    firstName: string;
+    type: string;
     /**
      * 
      * @type {string}
      * @memberof CreateUserDto
      */
-    lastName: string;
+    corporateName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateUserDto
+     */
+    firstName?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateUserDto
+     */
+    lastName?: string;
     /**
      * 
      * @type {string}
@@ -49,8 +61,8 @@ export interface CreateUserDto {
  * Check if a given object implements the CreateUserDto interface.
  */
 export function instanceOfCreateUserDto(value: object): value is CreateUserDto {
-    if (!('firstName' in value) || value['firstName'] === undefined) return false;
-    if (!('lastName' in value) || value['lastName'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('corporateName' in value) || value['corporateName'] === undefined) return false;
     if (!('email' in value) || value['email'] === undefined) return false;
     if (!('password' in value) || value['password'] === undefined) return false;
     return true;
@@ -66,8 +78,10 @@ export function CreateUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'firstName': json['firstName'],
-        'lastName': json['lastName'],
+        'type': json['type'],
+        'corporateName': json['corporateName'],
+        'firstName': json['firstName'] == null ? undefined : json['firstName'],
+        'lastName': json['lastName'] == null ? undefined : json['lastName'],
         'email': json['email'],
         'password': json['password'],
     };
@@ -84,6 +98,8 @@ export function CreateUserDtoToJSONTyped(value?: CreateUserDto | null, ignoreDis
 
     return {
         
+        'type': value['type'],
+        'corporateName': value['corporateName'],
         'firstName': value['firstName'],
         'lastName': value['lastName'],
         'email': value['email'],
