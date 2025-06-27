@@ -11,17 +11,7 @@ import {
   DialogTitle,
 } from "@/web/components/ui/dialog";
 import { Separator } from "@/web/components/ui/separator";
-import {
-  ChefHat,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  User,
-  Chrome,
-  Facebook,
-  Github,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
@@ -29,6 +19,8 @@ import { z } from "zod";
 import { ForgotPasswordModal } from "@/web/components/ForgotPasswordModal/ForgotPasswordModal";
 import { Configuration, UserApi } from "@/web/api-client/src";
 import toast, { Toaster } from "react-hot-toast";
+import Google from "../public/icons/google.svg";
+import Facebook from "../public/icons/facebook.svg";
 
 interface LoginModalProps {
   open: boolean;
@@ -171,18 +163,20 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             <div className="space-y-3">
               <Button
                 variant="outline"
-                className="w-full justify-start relative"
+                className="w-full justify-start relative bg-google-white hover:bg-gray-100 text-gray-800"
                 // onClick={() => handleSocialLogin("google")}
               >
-                <Chrome className="w-5 h-5 mr-3 text-blue-600" />
+                <div>
+                  <Google className="mr-3" />
+                </div>
                 Continuer avec Google
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start relative"
+                className="w-full justify-start relative bg-fb-blue hover:bg-blue-800 text-white hover:text-white"
                 // onClick={() => handleSocialLogin("facebook")}
               >
-                <Facebook className="w-5 h-5 mr-3 text-blue-700" />
+                <Facebook className="mr-3" />
                 Continuer avec Facebook
               </Button>
             </div>
