@@ -16,10 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   CreateUserDto,
+  UpdateUserDto,
 } from '../models/index';
 import {
     CreateUserDtoFromJSON,
     CreateUserDtoToJSON,
+    UpdateUserDtoFromJSON,
+    UpdateUserDtoToJSON,
 } from '../models/index';
 
 export interface CreateRequest {
@@ -36,8 +39,8 @@ export interface FindOneRequest {
 }
 
 export interface UpdateUserRequest {
-    id: number;
-    createUserDto: CreateUserDto;
+    id: string;
+    updateUserDto: UpdateUserDto;
 }
 
 /**
@@ -176,10 +179,10 @@ export class UserApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['createUserDto'] == null) {
+        if (requestParameters['updateUserDto'] == null) {
             throw new runtime.RequiredError(
-                'createUserDto',
-                'Required parameter "createUserDto" was null or undefined when calling updateUser().'
+                'updateUserDto',
+                'Required parameter "updateUserDto" was null or undefined when calling updateUser().'
             );
         }
 
@@ -194,7 +197,7 @@ export class UserApi extends runtime.BaseAPI {
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-            body: CreateUserDtoToJSON(requestParameters['createUserDto']),
+            body: UpdateUserDtoToJSON(requestParameters['updateUserDto']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

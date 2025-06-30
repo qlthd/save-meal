@@ -43,7 +43,6 @@ export default function MesDonationsPage() {
         }),
       );
       const fetched = await api.findAll();
-      console.log("fetched:", fetched);
       setCollectes(fetched);
     };
     fetchData();

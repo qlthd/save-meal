@@ -21,6 +21,13 @@ import {
 } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.gard';
+import { PartialType } from '@nestjs/swagger';
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
+
+interface AuthRequest {
+  user: { userId: string };
+}
 
 @Controller('user')
 export class UserController {
@@ -31,7 +38,6 @@ export class UserController {
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'Utilisateur créé.' })
   create(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
     return this.userService.create(createUserDto);
   }
 
@@ -64,21 +70,20 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
-  @ApiBody({ type: CreateUserDto })
+  @ApiBody({ type: UpdateUserDto })
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour.' })
   updateUser(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateData: Partial<CreateUserDto>,
-    @Request() req: any,
+    @Request() req: AuthRequest,
   ) {
-    console.log('req.user', req.user);
-    const jwtUserId = req.user.userId;
-    if (jwtUserId !== id) {
+    const userId = req.user.userId;
+    if (userId !== id) {
       throw new ForbiddenException('You can only access your own data');
     }
     if (!updateData) {
       throw new BadRequestException('Id and update data are required');
     }
-    return this.userService.updateUser(id, updateData);
+    return this.userService.updateUser(Number(id), updateData);
   }
 }

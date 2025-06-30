@@ -33,11 +33,16 @@ const handler = NextAuth({
           email: credentials?.email || "",
           password: credentials?.password || "",
         });
+        const user = {
+          id: res.toString(),
+          name: credentials?.email,
+          email: credentials?.email,
+        };
+
         if (res) {
           return {
-            id: res.toString(),
-            name: credentials?.email,
-            email: credentials?.email,
+            ...user,
+            accessToken: jwt.sign(user, "123"),
           };
         }
         return null;
@@ -49,6 +54,9 @@ const handler = NextAuth({
     signOut: "/auth/signout",
     error: "/auth/error",
     verifyRequest: "/auth/verify-request",
+  },
+  session: {
+    strategy: "jwt",
   },
   jwt: {
     maxAge: MAX_AGE,
@@ -89,16 +97,20 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.uid = user.id;
+        console.log("User authenticated:", user);
+        token.accessToken = user.accessToken;
+        token.user = user;
       }
       return token;
     },
     async session({ session, token }) {
-      session.accessToken = token;
+      session.accessToken = token.accessToken;
+      session.uid = token.uid;
       return session;
     },
   },
   secret: "123",
-  debug: process.env.NODE_ENV === "development",
+  debug: true,
 });
 
 export { handler as GET, handler as POST };
