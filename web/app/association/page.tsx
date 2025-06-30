@@ -1,23 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/web/components/ui/button";
 import { Card } from "@/web/components/ui/card";
 import { Input } from "@/web/components/ui/input";
 import { Badge } from "@/web/components/ui/badge";
 import { Search, MapPin, Clock, Users, Phone, Mail } from "lucide-react";
 import { Header } from "@/web/components/Header/Header";
+import {
+  Configuration,
+  FoodDonationApi,
+  FoodDonation,
+} from "@/web/api-client/src";
+import { formatToFrenchLongDate } from "@/web/shared/helpers/dateHelper";
 
 export default function AssociationPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDonation, setSelectedDonation] = useState<number | null>(null);
+  const [foodDonations, setFoodDonations] = useState<FoodDonation[]>([]);
 
-  const filteredDonations = mockDonations.filter(
-    (donation) =>
-      donation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      donation.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      donation.type.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  useEffect(() => {
+    const findAllDonations = async () => {
+      const api = new FoodDonationApi(
+        new Configuration({
+          basePath:
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
+        }),
+      );
+      const resp = await api.findAll();
+      const upcomingDonations = resp.upcoming;
+      setFoodDonations(upcomingDonations);
+    };
+    findAllDonations();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -41,16 +56,17 @@ export default function AssociationPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   placeholder="Rechercher par lieu, type d'événement..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 py-3 text-lg border-gray-300 focus:border-green-500 focus:ring-green-500"
+                  type="text"
+                  name="search"
+                  error={undefined}
                 />
               </div>
             </div>
 
             {/* Results */}
             <div className="flex-1 overflow-y-auto space-y-4">
-              {filteredDonations.length === 0 ? (
+              {foodDonations.length === 0 ? (
                 <Card className="p-8 text-center">
                   <div className="text-gray-400 mb-4">
                     <Search className="w-12 h-12 mx-auto" />
@@ -63,9 +79,9 @@ export default function AssociationPage() {
                   </p>
                 </Card>
               ) : (
-                filteredDonations.map((donation) => (
+                foodDonations.map((donation) => (
                   <Card
-                    key={donation.id}
+                    key={donation.title}
                     className={`p-6 cursor-pointer transition-all duration-200 hover:shadow-lg border-l-4 ${
                       donation.status === "Urgent"
                         ? "border-l-orange-500 bg-orange-50"
@@ -81,20 +97,20 @@ export default function AssociationPage() {
                       <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
                         {donation.title}
                       </h3>
-                      <Badge
-                        variant={
-                          donation.status === "Urgent"
-                            ? "destructive"
-                            : "default"
-                        }
-                        className={
-                          donation.status === "Urgent"
-                            ? "bg-orange-500"
-                            : "bg-green-500"
-                        }
-                      >
-                        {donation.status}
-                      </Badge>
+                      {/*<Badge*/}
+                      {/*  variant={*/}
+                      {/*    donation.status === "Urgent"*/}
+                      {/*      ? "destructive"*/}
+                      {/*      : "default"*/}
+                      {/*  }*/}
+                      {/*  className={*/}
+                      {/*    donation.status === "Urgent"*/}
+                      {/*      ? "bg-orange-500"*/}
+                      {/*      : "bg-green-500"*/}
+                      {/*  }*/}
+                      {/*>*/}
+                      {/*  {donation.}*/}
+                      {/*</Badge>*/}
                     </div>
 
                     <p className="text-gray-600 mb-4">{donation.description}</p>
@@ -102,29 +118,34 @@ export default function AssociationPage() {
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div className="flex items-center text-sm text-gray-600">
                         <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>{donation.location}</span>
+                        <span>{donation.pickupPlace}</span>
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
-                        <Clock className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>Reste {donation.timeLeft}</span>
+                        <Clock className="w-6 h-6 mr-2 text-gray-400" />
+                        <span>
+                          Disponible du{" "}
+                          {formatToFrenchLongDate(donation.availableFrom)} au{" "}
+                          {formatToFrenchLongDate(donation.availableTo)}
+                        </span>
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
                         <Users className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>{donation.portions} portions</span>
+                        <span>{donation.estimatedPortions} portions</span>
                       </div>
                       <div className="text-sm text-green-600 font-medium">
-                        {donation.distance}
+                        {/*{donation.distance}*/}
                       </div>
                     </div>
 
                     <div className="border-t pt-4">
                       <div className="flex items-center justify-between">
                         <div>
+                          <p className="mb-2">Informations de contact</p>
                           <p className="text-sm font-medium text-gray-900">
-                            {donation.contact}
+                            {donation.contactName}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {donation.type}
+                            {donation.contactEmail}
                           </p>
                         </div>
                         <div className="flex space-x-2">
@@ -134,7 +155,7 @@ export default function AssociationPage() {
                             className="text-green-600 border-green-600 hover:bg-green-50"
                           >
                             <Phone className="w-4 h-4 mr-1" />
-                            Appeler
+                            Voir le numéro
                           </Button>
                           <Button
                             size="sm"
