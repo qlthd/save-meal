@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { FoodDonation } from './FoodDonation';
+import {
+    FoodDonationFromJSON,
+    FoodDonationFromJSONTyped,
+    FoodDonationToJSON,
+    FoodDonationToJSONTyped,
+} from './FoodDonation';
+
 /**
  * 
  * @export
@@ -21,16 +29,16 @@ import { mapValues } from '../runtime';
 export interface FoodDonationListResponse {
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<FoodDonation>}
      * @memberof FoodDonationListResponse
      */
-    past: Array<string>;
+    past: Array<FoodDonation>;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<FoodDonation>}
      * @memberof FoodDonationListResponse
      */
-    upcoming: Array<string>;
+    upcoming: Array<FoodDonation>;
 }
 
 /**
@@ -52,8 +60,8 @@ export function FoodDonationListResponseFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'past': json['past'],
-        'upcoming': json['upcoming'],
+        'past': ((json['past'] as Array<any>).map(FoodDonationFromJSON)),
+        'upcoming': ((json['upcoming'] as Array<any>).map(FoodDonationFromJSON)),
     };
 }
 
@@ -68,8 +76,8 @@ export function FoodDonationListResponseToJSONTyped(value?: FoodDonationListResp
 
     return {
         
-        'past': value['past'],
-        'upcoming': value['upcoming'],
+        'past': ((value['past'] as Array<any>).map(FoodDonationToJSON)),
+        'upcoming': ((value['upcoming'] as Array<any>).map(FoodDonationToJSON)),
     };
 }
 

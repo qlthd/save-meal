@@ -9,6 +9,7 @@ models/Booking.ts
 models/CreateAssociationDto.ts
 models/CreateFoodDonationDto.ts
 models/CreateUserDto.ts
+models/FoodDonation.ts
 models/FoodDonationListResponse.ts
 models/UpdateUserDto.ts
 models/User.ts
