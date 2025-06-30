@@ -31,6 +31,6 @@ async function bootstrap() {
       operationIdFactory: (c: string, method: string) => method,
     },
   );
-  await app.listen(process.env.PORT ?? 3004);
+  await app.listen(3004);
 }
 bootstrap();

@@ -46,4 +46,13 @@ export class UserService {
 
     return user.id;
   }
+
+  async updateUser(id: number, updateData: Partial<CreateUserDto>) {
+    const { password, ...dataWithoutPassword } = updateData;
+
+    return this.prisma.user.update({
+      where: { id },
+      data: dataWithoutPassword,
+    });
+  }
 }

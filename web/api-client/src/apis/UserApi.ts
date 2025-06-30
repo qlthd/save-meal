@@ -35,6 +35,11 @@ export interface FindOneRequest {
     email: string;
 }
 
+export interface UpdateUserRequest {
+    id: number;
+    createUserDto: CreateUserDto;
+}
+
 /**
  * 
  */
@@ -158,6 +163,48 @@ export class UserApi extends runtime.BaseAPI {
     async findOne(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.findOneRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Mettre à jour un utilisateur
+     */
+    async updateUserRaw(requestParameters: UpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateUser().'
+            );
+        }
+
+        if (requestParameters['createUserDto'] == null) {
+            throw new runtime.RequiredError(
+                'createUserDto',
+                'Required parameter "createUserDto" was null or undefined when calling updateUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/user/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateUserDtoToJSON(requestParameters['createUserDto']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Mettre à jour un utilisateur
+     */
+    async updateUser(requestParameters: UpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateUserRaw(requestParameters, initOverrides);
     }
 
 }

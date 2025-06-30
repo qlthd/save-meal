@@ -8,6 +8,7 @@ import { HeaderProps } from "./Header.types";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
+import { RequestAccountInfosModal } from "../RequestAccountInfosModal/RequestAccountInfosModal";
 
 export const Header = (props: HeaderProps) => {
   const { isHomePage } = props;
@@ -77,6 +78,7 @@ export const Header = (props: HeaderProps) => {
       </nav>
       {/* Login Modal */}
       <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
+      <RequestAccountInfosModal open={true} onOpenChange={setLoginModalOpen} />
       <Toaster />
     </>
   );

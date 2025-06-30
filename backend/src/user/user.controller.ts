@@ -5,7 +5,11 @@ import {
   Body,
   Param,
   Query,
+  Patch,
   BadRequestException,
+  UseGuards,
+  ForbiddenException,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,8 +19,8 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
-import { FoodDonationListResponse } from '../food-donation/dto/FoodDonationListResponse';
 import { User } from './entities/user.entity';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.gard';
 
 @Controller('user')
 export class UserController {
@@ -55,5 +59,26 @@ export class UserController {
   })
   findOne(@Param('email') email: string) {
     return this.userService.findByEmail(email);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({ status: 200, description: 'Utilisateur mis à jour.' })
+  updateUser(
+    @Param('id') id: number,
+    @Body() updateData: Partial<CreateUserDto>,
+    @Request() req: any,
+  ) {
+    console.log('req.user', req.user);
+    const jwtUserId = req.user.userId;
+    if (jwtUserId !== id) {
+      throw new ForbiddenException('You can only access your own data');
+    }
+    if (!updateData) {
+      throw new BadRequestException('Id and update data are required');
+    }
+    return this.userService.updateUser(id, updateData);
   }
 }

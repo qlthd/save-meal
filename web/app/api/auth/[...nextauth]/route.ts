@@ -85,7 +85,19 @@ const handler = NextAuth({
       }
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.uid = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.accessToken = token;
+      return session;
+    },
+  },
+  secret: "123",
   debug: process.env.NODE_ENV === "development",
 });
 
