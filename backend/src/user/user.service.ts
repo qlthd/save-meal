@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { compare, hash } from 'bcrypt';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,10 @@ export class UserService {
     });
   }
 
-  async findByEmailAndPassword(email: string, password: string) {
+  async findByEmailAndPassword(
+    email: string,
+    password: string,
+  ): Promise<User | null> {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user) {
@@ -44,7 +48,14 @@ export class UserService {
       return null;
     }
 
-    return user.id;
+    return {
+      id: user.id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      corporateName: user.corporateName,
+      type: user.type,
+    };
   }
 
   async updateUser(id: number, updateData: Partial<CreateUserDto>) {

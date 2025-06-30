@@ -44,8 +44,8 @@ export class UserController {
   @Get('login')
   @ApiOperation({ summary: 'Authentifier un utilisateur' })
   @ApiOkResponse({
-    description: 'Id of user',
-    type: Number,
+    description: 'user',
+    type: User,
   })
   async findByEmailAndPassword(
     @Query('email') email: string,

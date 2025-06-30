@@ -11,5 +11,6 @@ models/CreateFoodDonationDto.ts
 models/CreateUserDto.ts
 models/FoodDonationListResponse.ts
 models/UpdateUserDto.ts
+models/User.ts
 models/index.ts
 runtime.ts

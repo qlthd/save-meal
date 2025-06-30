@@ -4,7 +4,7 @@ import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import jwt from "jsonwebtoken";
 import { JWT } from "next-auth/jwt";
-import { Configuration, FoodDonationApi, UserApi } from "@/web/api-client/src";
+import { Configuration, UserApi } from "@/web/api-client/src";
 const MAX_AGE = 1 * 24 * 60 * 60;
 const handler = NextAuth({
   providers: [
@@ -29,17 +29,12 @@ const handler = NextAuth({
               process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
           }),
         );
-        const res = await userApi.findByEmailAndPassword({
+        const user = await userApi.findByEmailAndPassword({
           email: credentials?.email || "",
           password: credentials?.password || "",
         });
-        const user = {
-          id: res.toString(),
-          name: credentials?.email,
-          email: credentials?.email,
-        };
 
-        if (res) {
+        if (user) {
           return {
             ...user,
             accessToken: jwt.sign(user, "123"),
@@ -95,15 +90,17 @@ const handler = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
+      console.log("jwt callback", { token, user });
       if (user) {
         token.uid = user.id;
-        console.log("User authenticated:", user);
         token.accessToken = user.accessToken;
         token.user = user;
       }
       return token;
     },
     async session({ session, token }) {
+      console.log("jwt callback 2", { session, token });
+      session.user = token.user || {};
       session.accessToken = token.accessToken;
       session.uid = token.uid;
       return session;

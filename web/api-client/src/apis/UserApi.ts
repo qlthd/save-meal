@@ -17,12 +17,15 @@ import * as runtime from '../runtime';
 import type {
   CreateUserDto,
   UpdateUserDto,
+  User,
 } from '../models/index';
 import {
     CreateUserDtoFromJSON,
     CreateUserDtoToJSON,
     UpdateUserDtoFromJSON,
     UpdateUserDtoToJSON,
+    UserFromJSON,
+    UserToJSON,
 } from '../models/index';
 
 export interface CreateRequest {
@@ -86,7 +89,7 @@ export class UserApi extends runtime.BaseAPI {
     /**
      * Authentifier un utilisateur
      */
-    async findByEmailAndPasswordRaw(requestParameters: FindByEmailAndPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async findByEmailAndPasswordRaw(requestParameters: FindByEmailAndPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
         if (requestParameters['email'] == null) {
             throw new runtime.RequiredError(
                 'email',
@@ -120,17 +123,13 @@ export class UserApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<number>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
     }
 
     /**
      * Authentifier un utilisateur
      */
-    async findByEmailAndPassword(requestParameters: FindByEmailAndPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
+    async findByEmailAndPassword(requestParameters: FindByEmailAndPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
         const response = await this.findByEmailAndPasswordRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -138,7 +137,7 @@ export class UserApi extends runtime.BaseAPI {
     /**
      * Récupérer un utilisateur par email
      */
-    async findOneRaw(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async findOneRaw(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
         if (requestParameters['email'] == null) {
             throw new runtime.RequiredError(
                 'email',
@@ -157,13 +156,13 @@ export class UserApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
     }
 
     /**
      * Récupérer un utilisateur par email
      */
-    async findOne(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async findOne(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
         const response = await this.findOneRaw(requestParameters, initOverrides);
         return await response.value();
     }
