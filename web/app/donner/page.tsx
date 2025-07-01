@@ -24,6 +24,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { useRouter } from "next/navigation";
 import { Configuration, FoodDonationApi } from "@/web/api-client/src";
+import PlaceAutocomplete from "react-google-autocomplete";
+import * as React from "react";
 
 const FoodDonationSchema = z
   .object({
@@ -34,9 +36,14 @@ const FoodDonationSchema = z
       .string()
       .min(1, "Le nombre de portions est requis")
       .regex(/^\d+$/, "Doit être un nombre entier"),
-    pickupPlace: z.string().min(1, "Le nom du lieu est requis"),
-    address: z.string().min(1, "L'adresse est requise"),
+    pickupPlace: z.string().optional(),
+    address: z
+      .string({ required_error: "L'adresse est requise" })
+      .nullable()
+      .refine((val) => !!val, { message: "L'adresse est requise" }),
     pickupInstructions: z.string().optional(),
+    longitude: z.number({ required_error: "Une adresse valide est requise" }),
+    latitude: z.number({ required_error: "Une adresse valide est requise" }),
     contactName: z.string().min(1, "Le nom de contact est requis"),
     contactPhone: z
       .string()
@@ -68,7 +75,9 @@ export type FoodDonationFormValue = {
   foodType: string;
   estimatedPortions: number;
   description: string;
-  pickupPlace: string;
+  pickupPlace?: string;
+  longitude: number;
+  latitude: number;
   address: string;
   pickupInstructions: string;
   startDate?: Date | string;
@@ -111,18 +120,20 @@ export default function DonnerPage() {
     handleSubmit,
     formState: { errors },
     setError,
+    setValue,
+    getValues,
   } = useForm<FoodDonationFormValue>({
     resolver: zodResolver(FoodDonationSchema),
   });
 
   const handleDietaryChange = (dietary: string, checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      dietaryInfo: {
-        ...prev.dietaryInfo,
-        [dietary]: checked,
-      },
-    }));
+    // setValue((prev) => ({
+    //   ...prev,
+    //   dietaryInfo: {
+    //     ...prev.dietaryInfo,
+    //     [dietary]: checked,
+    //   },
+    // }));
   };
 
   const getDateWithCustomTime = (time: string, date?: Date) => {
@@ -146,7 +157,7 @@ export default function DonnerPage() {
           description: data.description,
           foodType: data.foodType,
           estimatedPortions: Number(data.estimatedPortions),
-          pickupPlace: data.pickupPlace,
+          pickupPlace: data.pickupPlace || "",
           address: data.address,
           pickupInstructions: data.pickupInstructions || "",
           availableFrom:
@@ -161,6 +172,8 @@ export default function DonnerPage() {
           contactPhone: data.contactPhone,
           contactEmail: data.contactEmail,
           additionalNotes: data.additionalNotes ?? "",
+          latitude: data.latitude,
+          longitude: data.longitude,
           // dietaryInfo: {
           //   vegetarian: data.dietaryInfo.vegetarian || false,
           //   vegan: data.dietaryInfo.vegan || false,
@@ -184,6 +197,21 @@ export default function DonnerPage() {
             "Une erreur est survenue lors de la création de la collecte.",
         });
       });
+  };
+
+  const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
+    setValue("address", place.formatted_address || "");
+    if (place.geometry && place.geometry.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      setValue("longitude", lng);
+      setValue("latitude", lat);
+    } else {
+      setError("address", {
+        type: "manual",
+        message: "Veuillez sélectionner une adresse valide.",
+      });
+    }
   };
 
   return (
@@ -404,7 +432,7 @@ export default function DonnerPage() {
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="location">Nom du lieu</Label>
+                <Label htmlFor="location">Nom du lieu (facultatif)</Label>
                 <Input
                   type="text"
                   name="pickupPlace"
@@ -416,14 +444,26 @@ export default function DonnerPage() {
               </div>
               <div>
                 <Label htmlFor="address">Adresse complète</Label>
-                <Input
-                  type="text"
-                  name="address"
-                  error={errors.address}
-                  placeholder="123 Rue de la Paix, 75001 Paris"
-                  className="mt-2"
-                  register={register}
+                <PlaceAutocomplete
+                  className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                  apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
+                  onPlaceSelected={handlePlaceSelected}
+                  placeholder="123 rue de la Paix, 75001 Paris"
+                  options={{
+                    types: ["address"],
+                    componentRestrictions: { country: "fr" },
+                  }}
+                  onChange={(e) => {
+                    setValue("address", null);
+                  }}
                 />
+                {(errors.address || errors.latitude || errors.longitude) && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.address?.message ||
+                      errors.latitude?.message ||
+                      errors.longitude?.message}
+                  </p>
+                )}
               </div>
               <div className="grid md:col-span-2">
                 <Label htmlFor="pickupInstructions">

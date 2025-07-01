@@ -20,7 +20,7 @@ model FoodDonation {
   foodType           String
   estimatedPortions  Int
   description        String
-  pickupPlace        String
+  pickupPlace        String?
   latitude           Float
   longitude          Float
   address            String

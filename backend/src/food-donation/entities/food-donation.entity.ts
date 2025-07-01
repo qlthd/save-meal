@@ -14,8 +14,8 @@ export class FoodDonation {
   @ApiProperty()
   description: string;
 
-  @ApiProperty()
-  pickupPlace: string;
+  @ApiProperty({ required: false, nullable: true })
+  pickupPlace?: string;
 
   @ApiProperty()
   address: string;

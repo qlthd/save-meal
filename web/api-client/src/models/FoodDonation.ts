@@ -56,7 +56,7 @@ export interface FoodDonation {
      * @type {string}
      * @memberof FoodDonation
      */
-    pickupPlace: string;
+    pickupPlace?: string | null;
     /**
      * 
      * @type {string}
@@ -145,7 +145,6 @@ export function instanceOfFoodDonation(value: object): value is FoodDonation {
     if (!('foodType' in value) || value['foodType'] === undefined) return false;
     if (!('estimatedPortions' in value) || value['estimatedPortions'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
-    if (!('pickupPlace' in value) || value['pickupPlace'] === undefined) return false;
     if (!('address' in value) || value['address'] === undefined) return false;
     if (!('pickupInstructions' in value) || value['pickupInstructions'] === undefined) return false;
     if (!('availableFrom' in value) || value['availableFrom'] === undefined) return false;
@@ -172,7 +171,7 @@ export function FoodDonationFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'foodType': json['foodType'],
         'estimatedPortions': json['estimatedPortions'],
         'description': json['description'],
-        'pickupPlace': json['pickupPlace'],
+        'pickupPlace': json['pickupPlace'] == null ? undefined : json['pickupPlace'],
         'address': json['address'],
         'pickupInstructions': json['pickupInstructions'],
         'availableFrom': json['availableFrom'],

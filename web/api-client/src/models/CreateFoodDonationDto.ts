@@ -93,6 +93,18 @@ export interface CreateFoodDonationDto {
     contactEmail: string;
     /**
      * 
+     * @type {number}
+     * @memberof CreateFoodDonationDto
+     */
+    latitude: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateFoodDonationDto
+     */
+    longitude: number;
+    /**
+     * 
      * @type {string}
      * @memberof CreateFoodDonationDto
      */
@@ -127,6 +139,8 @@ export function instanceOfCreateFoodDonationDto(value: object): value is CreateF
     if (!('contactName' in value) || value['contactName'] === undefined) return false;
     if (!('contactPhone' in value) || value['contactPhone'] === undefined) return false;
     if (!('contactEmail' in value) || value['contactEmail'] === undefined) return false;
+    if (!('latitude' in value) || value['latitude'] === undefined) return false;
+    if (!('longitude' in value) || value['longitude'] === undefined) return false;
     return true;
 }
 
@@ -152,6 +166,8 @@ export function CreateFoodDonationDtoFromJSONTyped(json: any, ignoreDiscriminato
         'contactName': json['contactName'],
         'contactPhone': json['contactPhone'],
         'contactEmail': json['contactEmail'],
+        'latitude': json['latitude'],
+        'longitude': json['longitude'],
         'additionalNotes': json['additionalNotes'] == null ? undefined : json['additionalNotes'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
         'updatedAt': json['updatedAt'] == null ? undefined : json['updatedAt'],
@@ -181,6 +197,8 @@ export function CreateFoodDonationDtoToJSONTyped(value?: CreateFoodDonationDto |
         'contactName': value['contactName'],
         'contactPhone': value['contactPhone'],
         'contactEmail': value['contactEmail'],
+        'latitude': value['latitude'],
+        'longitude': value['longitude'],
         'additionalNotes': value['additionalNotes'],
         'createdAt': value['createdAt'],
         'updatedAt': value['updatedAt'],
