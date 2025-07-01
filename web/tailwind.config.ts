@@ -32,6 +32,8 @@ export default {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        lightGrayishYellow: "#f1f0cc",
+        reddish: "#ea362a",
         green: {
           50: "#e6f4ec",
           100: "#cce9d9",
@@ -39,7 +41,7 @@ export default {
           300: "#66bd8d",
           400: "#33a867",
           500: "#009241",
-          600: "#067c37",
+          600: "#1B4D3E", //main
           700: "#08642e",
           800: "#094d24",
           900: "#053725",

@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export const Header = (props: HeaderProps) => {
   const { isHomePage } = props;
@@ -29,7 +30,7 @@ export const Header = (props: HeaderProps) => {
   return (
     <>
       <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className=" flex items-center justify-between">
           <div className="flex items-center space-x-4">
             {!isHomePage && (
               <>
@@ -45,9 +46,9 @@ export const Header = (props: HeaderProps) => {
             )}
             <Link href="/" className="flex items-center">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2F65e64ef700ed4a1cb9ad3db72540f93c?format=webp&width=800"
+                src="/icons/logo.png"
                 alt="Save Meal Logo"
-                className="h-14 w-auto"
+                className="w-full h-8 my-4"
               />
             </Link>
           </div>

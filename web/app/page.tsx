@@ -27,18 +27,15 @@ export default function HomePage() {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2Ff711f74f70e540fe8839c628da3ab61e?format=webp&width=800"
                 alt="Main tenant un cœur et un épi de blé symbolisant la solidarité alimentaire"
-                className="w-40 h-40 sm:w-52 sm:h-52 lg:w-64 lg:h-64 object-contain"
+                className="w-40 h-40 sm:w-40 sm:h-40 lg:w-50 lg:h-50 object-contain"
                 style={{ filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1))" }}
               />
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Transformons les{" "}
-              <span className="bg-gradient-to-r from-green-600 to-orange-500 bg-clip-text text-transparent">
-                surplus alimentaires
-              </span>{" "}
-              en solidarité
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-green-600 mb-6 leading-tight">
+              Transformons les <span className="">surplus alimentaires</span> en
+              solidarité
             </h1>
-            <p className="text-xl sm:text-2xl text-gray-600 mb-12 leading-relaxed">
+            <p className="text-xl sm:text-2xl text-green-600 mb-12 leading-relaxed">
               Connectons les organisateurs d'événements aux associations pour
               que chaque repas trouve sa place
             </p>
@@ -48,7 +45,7 @@ export default function HomePage() {
               <Link href="/association" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
+                  className="w-full bg-green-600 hover:bg-green-700 text-lightGrayishYellow px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
                 >
                   <Users className="w-5 h-5 mr-2" />
                   Je suis une association
@@ -59,7 +56,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="secondary"
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
+                  className="w-full bg-reddish hover:bg-red-400 text-lightGrayishYellow px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
                 >
                   <Heart className="w-5 h-5 mr-2" />
                   Je prévois de donner
@@ -101,8 +98,10 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Step 1 */}
             <Card className="p-8 text-center border-0 shadow-lg hover:shadow-xl transition-shadow duration-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">1</span>
+              <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-lightGrayishYellow">
+                  1
+                </span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Signalez vos surplus
@@ -115,8 +114,10 @@ export default function HomePage() {
 
             {/* Step 2 */}
             <Card className="p-8 text-center border-0 shadow-lg hover:shadow-xl transition-shadow duration-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">2</span>
+              <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-lightGrayishYellow">
+                  2
+                </span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Connexion automatique
@@ -129,8 +130,10 @@ export default function HomePage() {
 
             {/* Step 3 */}
             <Card className="p-8 text-center border-0 shadow-lg hover:shadow-xl transition-shadow duration-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">3</span>
+              <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-lightGrayishYellow">
+                  3
+                </span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Récupération organisée
@@ -145,7 +148,7 @@ export default function HomePage() {
 
         {/* Impact Stats */}
         <section className="py-16">
-          <div className="bg-gradient-to-r from-green-600 to-orange-500 rounded-3xl p-8 sm:p-12 text-white text-center">
+          <div className="bg-green-600 rounded-3xl p-8 sm:p-12 text-lightGrayishYellow text-center">
             <h2 className="text-3xl sm:text-4xl font-bold mb-8">
               Ensemble, créons un impact positif
             </h2>
