@@ -101,6 +101,18 @@ export interface FoodDonation {
     contactEmail: string;
     /**
      * 
+     * @type {number}
+     * @memberof FoodDonation
+     */
+    latitude: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodDonation
+     */
+    longitude: number;
+    /**
+     * 
      * @type {string}
      * @memberof FoodDonation
      */
@@ -141,6 +153,8 @@ export function instanceOfFoodDonation(value: object): value is FoodDonation {
     if (!('contactName' in value) || value['contactName'] === undefined) return false;
     if (!('contactPhone' in value) || value['contactPhone'] === undefined) return false;
     if (!('contactEmail' in value) || value['contactEmail'] === undefined) return false;
+    if (!('latitude' in value) || value['latitude'] === undefined) return false;
+    if (!('longitude' in value) || value['longitude'] === undefined) return false;
     return true;
 }
 
@@ -166,6 +180,8 @@ export function FoodDonationFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'contactName': json['contactName'],
         'contactPhone': json['contactPhone'],
         'contactEmail': json['contactEmail'],
+        'latitude': json['latitude'],
+        'longitude': json['longitude'],
         'additionalNotes': json['additionalNotes'] == null ? undefined : json['additionalNotes'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
         'updatedAt': json['updatedAt'] == null ? undefined : json['updatedAt'],
@@ -196,6 +212,8 @@ export function FoodDonationToJSONTyped(value?: FoodDonation | null, ignoreDiscr
         'contactName': value['contactName'],
         'contactPhone': value['contactPhone'],
         'contactEmail': value['contactEmail'],
+        'latitude': value['latitude'],
+        'longitude': value['longitude'],
         'additionalNotes': value['additionalNotes'],
         'createdAt': value['createdAt'],
         'updatedAt': value['updatedAt'],

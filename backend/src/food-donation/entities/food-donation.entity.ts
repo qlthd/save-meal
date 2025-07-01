@@ -38,6 +38,12 @@ export class FoodDonation {
   @ApiProperty()
   contactEmail: string;
 
+  @ApiProperty()
+  latitude: number;
+
+  @ApiProperty()
+  longitude: number;
+
   @ApiProperty({ required: false, nullable: true })
   additionalNotes?: string;
 

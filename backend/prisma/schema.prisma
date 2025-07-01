@@ -21,6 +21,8 @@ model FoodDonation {
   estimatedPortions  Int
   description        String
   pickupPlace        String
+  latitude           Float
+  longitude          Float
   address            String
   pickupInstructions String
   availableFrom      DateTime
