@@ -15,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <link
+        precedence="default"
         href="https://api.fontshare.com/v2/css?f[]=satoshi@700&display=swap"
         rel="stylesheet"
       />
