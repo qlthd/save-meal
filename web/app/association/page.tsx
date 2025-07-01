@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/web/components/ui/button";
 import { Card } from "@/web/components/ui/card";
-import { Input } from "@/web/components/ui/input";
-import { Badge } from "@/web/components/ui/badge";
 import { Search, MapPin, Clock, Users, Phone, Mail } from "lucide-react";
 import { Header } from "@/web/components/Header/Header";
 import {
@@ -13,12 +11,57 @@ import {
   FoodDonation,
 } from "@/web/api-client/src";
 import { formatToFrenchLongDate } from "@/web/shared/helpers/dateHelper";
+import GoogleMapReact from "google-map-react";
+import PlaceAutocomplete from "react-google-autocomplete";
+import haversine from "haversine-distance"; // npm install haversine-distance
+import { MapMarker } from "@/web/components/MapMarker/MapMarker";
 
 export default function AssociationPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDonation, setSelectedDonation] = useState<number | null>(null);
-  const [foodDonations, setFoodDonations] = useState<FoodDonation[]>([]);
+  const [foodDonations, setFoodDonations] = useState<FoodDonation[]>();
+  const [initialFoodDonations, setInitialFoodDonations] =
+    useState<FoodDonation[]>();
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [searchedLocation, setSearchedLocation] = useState<string | null>(null);
 
+  const getMapCenter = (
+    locations: { latitude: number; longitude: number }[],
+  ) => {
+    const lats = locations.map((loc) => loc.latitude);
+    const lngs = locations.map((loc) => loc.longitude);
+
+    const latMin = Math.min(...lats);
+    const latMax = Math.max(...lats);
+    const lngMin = Math.min(...lngs);
+    const lngMax = Math.max(...lngs);
+
+    return {
+      lat: (latMin + latMax) / 2,
+      lng: (lngMin + lngMax) / 2,
+    };
+  };
+
+  const getZoomLevel = (
+    locations: { latitude: number; longitude: number }[],
+  ) => {
+    if (locations.length <= 1) return 12;
+
+    const lats = locations.map((loc) => loc.latitude);
+    const lngs = locations.map((loc) => loc.longitude);
+    const latDelta = Math.max(...lats) - Math.min(...lats);
+    const lngDelta = Math.max(...lngs) - Math.min(...lngs);
+    const maxDelta = Math.max(latDelta, lngDelta);
+
+    if (maxDelta < 0.01) return 15;
+    if (maxDelta < 0.05) return 13;
+    if (maxDelta < 0.2) return 11;
+    if (maxDelta < 1) return 9;
+    return 6;
+  };
+
+  const [mapCenter, setMapCenter] = useState<any>();
+  const [mapZoom, setMapZoom] = useState<any>();
   useEffect(() => {
     const findAllDonations = async () => {
       const api = new FoodDonationApi(
@@ -30,10 +73,31 @@ export default function AssociationPage() {
       const resp = await api.findAll();
       const upcomingDonations = resp.upcoming;
       setFoodDonations(upcomingDonations);
+      setInitialFoodDonations(upcomingDonations);
+      setMapCenter(getMapCenter(upcomingDonations));
+      setMapZoom(getZoomLevel(upcomingDonations));
     };
     findAllDonations();
   }, []);
 
+  const RADIUS_KM = 20;
+
+  function handlePlaceSelected(place: any) {
+    setSearchedLocation(place.formatted_address);
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+
+    const filtered = foodDonations?.filter((donation) => {
+      const distance = haversine(
+        { lat, lng },
+        { lat: donation.latitude, lng: donation.longitude },
+      );
+      return distance / 1000 <= RADIUS_KM; // distance en km
+    });
+    console.log("Filtered donations:", filtered);
+    // Mettre à jour l'état avec les résultats filtrés
+    setFoodDonations(filtered);
+  }
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -54,19 +118,28 @@ export default function AssociationPage() {
             <div className="mb-6">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  placeholder="Rechercher par lieu, type d'événement..."
-                  className="pl-10 py-3 text-lg border-gray-300 focus:border-green-500 focus:ring-green-500"
-                  type="text"
-                  name="search"
-                  error={undefined}
+                <PlaceAutocomplete
+                  className="pl-10 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                  apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
+                  onPlaceSelected={handlePlaceSelected}
+                  placeholder="Rechercher un lieu"
+                  options={{
+                    componentRestrictions: { country: "fr" },
+                  }}
+                  onChange={(e) => {
+                    const value = (e.target as HTMLInputElement).value;
+                    if (value === "") {
+                      setSearchedLocation(null);
+                      setFoodDonations(initialFoodDonations);
+                    }
+                  }}
                 />
               </div>
             </div>
 
             {/* Results */}
             <div className="flex-1 overflow-y-auto space-y-4">
-              {foodDonations.length === 0 ? (
+              {foodDonations?.length === 0 ? (
                 <Card className="p-8 text-center">
                   <div className="text-gray-400 mb-4">
                     <Search className="w-12 h-12 mx-auto" />
@@ -79,96 +152,105 @@ export default function AssociationPage() {
                   </p>
                 </Card>
               ) : (
-                foodDonations.map((donation) => (
-                  <Card
-                    key={donation.title}
-                    className={`p-6 cursor-pointer transition-all duration-200 hover:shadow-lg border-l-4 ${
-                      donation.status === "Urgent"
-                        ? "border-l-orange-500 bg-orange-50"
-                        : "border-l-green-500"
-                    } ${
-                      selectedDonation === donation.id
-                        ? "ring-2 ring-green-500 shadow-lg"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedDonation(donation.id)}
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-                        {donation.title}
-                      </h3>
-                      {/*<Badge*/}
-                      {/*  variant={*/}
-                      {/*    donation.status === "Urgent"*/}
-                      {/*      ? "destructive"*/}
-                      {/*      : "default"*/}
-                      {/*  }*/}
-                      {/*  className={*/}
-                      {/*    donation.status === "Urgent"*/}
-                      {/*      ? "bg-orange-500"*/}
-                      {/*      : "bg-green-500"*/}
-                      {/*  }*/}
-                      {/*>*/}
-                      {/*  {donation.}*/}
-                      {/*</Badge>*/}
-                    </div>
+                <>
+                  {searchedLocation ? (
+                    <span className="text-xl">
+                      {foodDonations?.length}{" "}
+                      {foodDonations?.length && foodDonations?.length > 1
+                        ? "collectes trouvées"
+                        : "collecte trouvée"}{" "}
+                      à {searchedLocation} et aux alentours
+                    </span>
+                  ) : (
+                    <span className="text-xl">
+                      {foodDonations?.length} collectes disponibles
+                    </span>
+                  )}
+                  {foodDonations?.map((donation, i) => (
+                    <Card
+                      key={donation.title}
+                      className={`relative p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:bg-emerald-50 border-l-4 ${
+                        hoveredIndex === i
+                          ? "shadow-lg bg-emerald-50"
+                          : selectedDonation === i
+                            ? "ring-2 ring-green-500 shadow-lg"
+                            : ""
+                      } border-l-green-500`}
+                      onClick={() => {
+                        setMapCenter({
+                          lat: donation.latitude,
+                          lng: donation.longitude,
+                        });
+                        setMapZoom((prev) => (prev === 15 ? 16 : 15));
+                      }}
+                      onMouseEnter={() => setHoveredIndex(i)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+                          {donation.title}
+                        </h3>
+                      </div>
 
-                    <p className="text-gray-600 mb-4">{donation.description}</p>
+                      <p className="text-gray-600 mb-4">
+                        {donation.description}
+                      </p>
 
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>{donation.pickupPlace}</span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Clock className="w-6 h-6 mr-2 text-gray-400" />
-                        <span>
-                          Disponible du{" "}
-                          {formatToFrenchLongDate(donation.availableFrom)} au{" "}
-                          {formatToFrenchLongDate(donation.availableTo)}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Users className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>{donation.estimatedPortions} portions</span>
-                      </div>
-                      <div className="text-sm text-green-600 font-medium">
-                        {/*{donation.distance}*/}
-                      </div>
-                    </div>
-
-                    <div className="border-t pt-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="mb-2">Informations de contact</p>
-                          <p className="text-sm font-medium text-gray-900">
-                            {donation.contactName}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {donation.contactEmail}
-                          </p>
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2 text-gray-400" />
+                          <span>{donation.pickupPlace}</span>
                         </div>
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-green-600 border-green-600 hover:bg-green-50"
-                          >
-                            <Phone className="w-4 h-4 mr-1" />
-                            Voir le numéro
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            <Mail className="w-4 h-4 mr-1" />
-                            Réserver
-                          </Button>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Clock className="w-6 h-6 mr-2 text-gray-400" />
+                          <span>
+                            Disponible du{" "}
+                            {formatToFrenchLongDate(donation.availableFrom)} au{" "}
+                            {formatToFrenchLongDate(donation.availableTo)}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Users className="w-4 h-4 mr-2 text-gray-400" />
+                          <span>{donation.estimatedPortions} portions</span>
+                        </div>
+                        <div className="text-sm text-green-600 font-medium">
+                          {/*{donation.distance}*/}
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                ))
+
+                      <div className="border-t pt-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="mb-2">Informations de contact</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              {donation.contactName}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {donation.contactEmail}
+                            </p>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-green-600 border-green-600 hover:bg-green-50"
+                            >
+                              <Phone className="w-4 h-4 mr-1" />
+                              Voir le numéro
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              <Mail className="w-4 h-4 mr-1" />
+                              Réserver
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </>
               )}
             </div>
           </div>
@@ -190,44 +272,33 @@ export default function AssociationPage() {
                     </p>
                   </div>
                 </div>
-
-                {/* Mock Map Pins */}
-                <div className="absolute top-1/4 left-1/3 w-4 h-4 bg-green-500 rounded-full shadow-lg animate-pulse"></div>
-                <div className="absolute top-1/2 right-1/3 w-4 h-4 bg-orange-500 rounded-full shadow-lg animate-pulse"></div>
-                <div className="absolute bottom-1/3 left-1/2 w-4 h-4 bg-green-500 rounded-full shadow-lg animate-pulse"></div>
-
-                {/* Map Controls */}
-                <div className="absolute top-4 right-4 flex flex-col space-y-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="bg-white shadow-lg"
-                  >
-                    +
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="bg-white shadow-lg"
-                  >
-                    -
-                  </Button>
-                </div>
-
-                {/* Legend */}
-                <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-3">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                    Légende
-                  </h4>
-                  <div className="flex items-center mb-1">
-                    <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                    <span className="text-xs text-gray-600">Disponible</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
-                    <span className="text-xs text-gray-600">Urgent</span>
-                  </div>
-                </div>
+                <GoogleMapReact
+                  bootstrapURLKeys={{
+                    key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+                    libraries: ["places"],
+                  }}
+                  center={mapCenter}
+                  zoom={mapZoom}
+                >
+                  {foodDonations?.map((location, i) => (
+                    <MapMarker
+                      key={i}
+                      lat={location.latitude}
+                      lng={location.longitude}
+                      number={i + 1}
+                      hovered={hoveredIndex === i}
+                      onMouseEnter={() => setHoveredIndex(i)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                      onClick={() => {
+                        setMapCenter({
+                          lat: location.latitude,
+                          lng: location.longitude,
+                        });
+                        setMapZoom((prev) => (prev === 15 ? 16 : 15));
+                      }}
+                    />
+                  ))}
+                </GoogleMapReact>
               </div>
             </Card>
           </div>

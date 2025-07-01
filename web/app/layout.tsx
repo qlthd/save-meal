@@ -5,6 +5,7 @@ import { Toaster } from "@/web/components/ui/toaster";
 import { Toaster as Sonner } from "@/web/components/ui/sonner";
 import { TooltipProvider } from "@/web/components/ui/tooltip";
 import { SessionProvider } from "next-auth/react";
+import LoadGoogleProvider from "@/web/components/LoadGoogleProvider";
 
 export default function RootLayout({
   children,
@@ -19,13 +20,15 @@ export default function RootLayout({
       />
 
       <body>
-        <SessionProvider>
-          <TooltipProvider>
-            {children}
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </SessionProvider>
+        <LoadGoogleProvider>
+          <SessionProvider>
+            <TooltipProvider>
+              {children}
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
+          </SessionProvider>
+        </LoadGoogleProvider>
       </body>
     </html>
   );
