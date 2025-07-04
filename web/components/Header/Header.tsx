@@ -55,22 +55,24 @@ export const Header = (props: HeaderProps) => {
           <div className="flex items-center gap-x-3">
             {userType === "association" && (
               <>
-                <button
-                  className="inline-flex text-sm px-3 py-2 items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => router.push("/donner")}
-                >
-                  <Plus className="w-5 h-5" />
-                  Créer une collecte
-                </button>
                 <button className="inline-flex px-3 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md text-gray-600 hover:text-green-600">
                   Mes collectes
                 </button>
               </>
             )}
             {userType === "donateur" && (
-              <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md text-gray-600 hover:text-green-600">
-                Mes donations
-              </button>
+              <>
+                <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md text-gray-600 hover:text-green-600">
+                  Gérer mes dons
+                </button>
+                <button
+                  className="inline-flex text-sm px-3 py-2 items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => router.push("/donner")}
+                >
+                  <Plus className="w-5 h-5" />
+                  Créer un don
+                </button>
+              </>
             )}
             {/*{status === "authenticated" && (*/}
             {/*  <button className="inline-flex mx-3 items-center border h-8 w-8 rounded-full justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent text-gray-600 hover:text-green-600">*/}
