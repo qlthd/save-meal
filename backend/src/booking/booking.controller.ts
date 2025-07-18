@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+  ForbiddenException,
+} from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import {
@@ -8,6 +17,8 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { Booking } from './entities/booking.entity';
+import { JwtAuthGuard } from '../guards/jwt-auth.gard';
+import { AuthRequest } from 'src/auth/types/AuthRequest';
 
 @Controller('booking')
 export class BookingController {
@@ -31,13 +42,19 @@ export class BookingController {
     return this.bookingService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer une réservation' })
+  @ApiOperation({ summary: "Récupérer les réservations d'une association" })
   @ApiOkResponse({
-    description: 'Un booking',
+    description: 'Une liste de réservations',
     type: Booking,
+    isArray: true,
   })
-  findOne(@Param('id') id: string) {
-    return this.bookingService.findOne(+id);
+  findByAssociation(@Param('id') id: string, @Request() req: AuthRequest) {
+    const userId = req.user.userId;
+    if (userId !== id) {
+      throw new ForbiddenException('You can only access your own data');
+    }
+    return this.bookingService.findByAssociation(+id);
   }
 }

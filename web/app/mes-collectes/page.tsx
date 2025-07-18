@@ -418,7 +418,7 @@ export default function MesCollectesPage() {
                     )}
                     <Button variant="ghost" size="sm">
                       <Phone className="w-4 h-4 mr-1" />
-                      Appeler
+                      Voir le numéro de téléphone
                     </Button>
                   </div>
                 </Card>

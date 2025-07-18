@@ -43,6 +43,12 @@ export interface Booking {
      * @memberof Booking
      */
     createdAt: Date;
+    /**
+     * 
+     * @type {Booking}
+     * @memberof Booking
+     */
+    association: Booking | null;
 }
 
 /**
@@ -53,6 +59,7 @@ export function instanceOfBooking(value: object): value is Booking {
     if (!('associationId' in value) || value['associationId'] === undefined) return false;
     if (!('foodDonationId' in value) || value['foodDonationId'] === undefined) return false;
     if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
+    if (!('association' in value) || value['association'] === undefined) return false;
     return true;
 }
 
@@ -70,6 +77,7 @@ export function BookingFromJSONTyped(json: any, ignoreDiscriminator: boolean): B
         'associationId': json['associationId'],
         'foodDonationId': json['foodDonationId'],
         'createdAt': (new Date(json['createdAt'])),
+        'association': BookingFromJSON(json['association']),
     };
 }
 
@@ -88,6 +96,7 @@ export function BookingToJSONTyped(value?: Booking | null, ignoreDiscriminator: 
         'associationId': value['associationId'],
         'foodDonationId': value['foodDonationId'],
         'createdAt': ((value['createdAt']).toISOString()),
+        'association': BookingToJSON(value['association']),
     };
 }
 

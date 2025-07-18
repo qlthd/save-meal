@@ -26,7 +26,7 @@ export interface CreateRequest {
     body: object;
 }
 
-export interface FindOneRequest {
+export interface FindByAssociationRequest {
     id: string;
 }
 
@@ -95,13 +95,13 @@ export class BookingApi extends runtime.BaseAPI {
     }
 
     /**
-     * Récupérer une réservation
+     * Récupérer les réservations d\'une association
      */
-    async findOneRaw(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Booking>> {
+    async findByAssociationRaw(requestParameters: FindByAssociationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Booking>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling findOne().'
+                'Required parameter "id" was null or undefined when calling findByAssociation().'
             );
         }
 
@@ -116,14 +116,14 @@ export class BookingApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => BookingFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(BookingFromJSON));
     }
 
     /**
-     * Récupérer une réservation
+     * Récupérer les réservations d\'une association
      */
-    async findOne(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Booking> {
-        const response = await this.findOneRaw(requestParameters, initOverrides);
+    async findByAssociation(requestParameters: FindByAssociationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Booking>> {
+        const response = await this.findByAssociationRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

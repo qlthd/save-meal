@@ -16,7 +16,12 @@ export class BookingService {
     return this.prisma.booking.findMany();
   }
 
-  async findOne(id: number): Promise<Booking | null> {
-    return this.prisma.booking.findUnique({ where: { id } });
+  async findByAssociation(id: number): Promise<Booking[] | null> {
+    return this.prisma.booking.findMany({
+      where: { associationId: id },
+      include: {
+        foodDonation: true,
+      },
+    });
   }
 }

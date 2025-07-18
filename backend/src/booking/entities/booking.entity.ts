@@ -12,4 +12,7 @@ export class Booking {
 
   @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty({ nullable: true })
+  association?: Booking;
 }

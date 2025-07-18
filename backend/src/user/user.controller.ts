@@ -22,12 +22,9 @@ import {
 import { User } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.gard';
 import { PartialType } from '@nestjs/swagger';
+import { AuthRequest } from 'src/auth/types/AuthRequest';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
-
-interface AuthRequest {
-  user: { userId: string };
-}
 
 @Controller('user')
 export class UserController {
