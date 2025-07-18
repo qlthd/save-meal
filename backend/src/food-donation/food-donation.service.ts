@@ -22,7 +22,7 @@ export class FoodDonationService {
     return res.map((fd) => {
       const foodDonation: FoodDonation = {
         ...fd,
-        pickupPlace: fd.pickupPlace ?? undefined,
+        pickupPlace: fd.pickupPlace ?? null,
         createdAt: fd.createdAt.toISOString(),
         updatedAt: fd.updatedAt?.toISOString() ?? undefined,
         availableFrom: fd.availableFrom.toISOString(),

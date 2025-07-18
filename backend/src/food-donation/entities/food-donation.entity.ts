@@ -15,7 +15,7 @@ export class FoodDonation {
   description: string;
 
   @ApiProperty({ required: false, nullable: true })
-  pickupPlace?: string;
+  pickupPlace: string | null;
 
   @ApiProperty()
   address: string;
@@ -53,6 +53,6 @@ export class FoodDonation {
   @ApiProperty({ required: false, nullable: true })
   updatedAt?: string;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({ type: () => Booking, required: false, nullable: true })
   booking?: Booking;
 }

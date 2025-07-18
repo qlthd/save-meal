@@ -17,11 +17,26 @@ export class BookingService {
   }
 
   async findByAssociation(id: number): Promise<Booking[] | null> {
-    return this.prisma.booking.findMany({
+    const res = await this.prisma.booking.findMany({
       where: { associationId: id },
       include: {
         foodDonation: true,
       },
+    });
+    return res.map((b) => {
+      const booking: Booking = {
+        ...b,
+        foodDonation: {
+          ...b.foodDonation,
+          pickupPlace: b.foodDonation.pickupPlace ?? null,
+          createdAt: b.foodDonation.createdAt.toISOString(),
+          updatedAt: b.foodDonation.updatedAt?.toISOString() ?? undefined,
+          availableFrom: b.foodDonation.availableFrom.toISOString(),
+          availableTo: b.foodDonation.availableTo.toISOString(),
+          additionalNotes: b.foodDonation.additionalNotes ?? undefined,
+        },
+      };
+      return booking;
     });
   }
 }

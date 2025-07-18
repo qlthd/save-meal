@@ -1,12 +1,10 @@
 apis/AppApi.ts
-apis/AssociationApi.ts
 apis/BookingApi.ts
 apis/FoodDonationApi.ts
 apis/UserApi.ts
 apis/index.ts
 index.ts
 models/Booking.ts
-models/CreateAssociationDto.ts
 models/CreateFoodDonationDto.ts
 models/CreateUserDto.ts
 models/FoodDonation.ts

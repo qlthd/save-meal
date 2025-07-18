@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -27,6 +27,13 @@ import { Badge } from "@/web/components/ui/badge";
 import { Button } from "@/web/components/ui/button";
 import { Card } from "@/web/components/ui/card";
 import { LoginModal } from "@/web/components/LoginModal";
+import {
+  Booking,
+  BookingApi,
+  Configuration,
+  FoodDonationApi,
+} from "@/web/api-client/src";
+import { useSession } from "next-auth/react";
 
 // Mock data for association collections
 const mockPastCollections = [
@@ -134,6 +141,33 @@ export default function MesCollectesPage() {
   const [pastCollapsed, setPastCollapsed] = useState(true);
   const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const api = new BookingApi(
+        new Configuration({
+          basePath:
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
+        }),
+      );
+      if (session?.uid) {
+        const bookings = await api.findByAssociation(
+          {
+            id: session.uid,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+          },
+        );
+        setBookings(bookings);
+      }
+    };
+    fetchData();
+  }, [status]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -284,7 +318,7 @@ export default function MesCollectesPage() {
               >
                 <div className="flex items-center space-x-2">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Collectes à venir ({mockUpcomingCollections.length})
+                    Collectes à venir ({bookings.length})
                   </h2>
                   <Badge className="bg-green-100 text-green-800">
                     {
@@ -303,35 +337,35 @@ export default function MesCollectesPage() {
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-4 mt-4">
-              {mockUpcomingCollections.map((collection) => (
-                <Card key={collection.id} className="p-6">
+              {bookings.map((booking) => (
+                <Card key={booking.id} className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <h3 className="font-semibold text-lg text-gray-900">
-                          {collection.title}
+                          {booking.foodDonation?.title}
                         </h3>
-                        {getStatusBadge(collection.status)}
+                        {getStatusBadge("collection.status")}
                       </div>
-                      <p className="text-gray-600 mb-3">
-                        {collection.description}
-                      </p>
+                      {/*<p className="text-gray-600 mb-3">{booking.foodDo}</p>*/}
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4 text-gray-400" />
-                          <span>
-                            {formatDate(collection.date)} à{" "}
-                            {formatTime(collection.time)}
-                          </span>
+                          {/*<span>*/}
+                          {/*  {formatDate(booking.foodDonation?.availableFrom)} à{" "}*/}
+                          {/*  {formatTime(collection.time)}*/}
+                          {/*</span>*/}
                         </div>
                         <div className="flex items-center space-x-2">
                           <MapPin className="w-4 h-4 text-gray-400" />
-                          <span>{collection.location}</span>
+                          {/*<span>{collection.location}</span>*/}
                         </div>
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4 text-gray-400" />
-                          <span>{collection.portions} portions</span>
+                          <span>
+                            {booking.foodDonation?.estimatedPortions} portions
+                          </span>
                         </div>
                       </div>
 
@@ -340,15 +374,15 @@ export default function MesCollectesPage() {
                           Contact donateur :
                         </p>
                         <div className="flex flex-col space-y-1 text-sm text-gray-600">
-                          <span>{collection.donatorName}</span>
+                          <span>{booking.foodDonation?.contactName}</span>
                           <div className="flex items-center space-x-4">
                             <div className="flex items-center space-x-1">
                               <Phone className="w-3 h-3" />
-                              <span>{collection.donatorPhone}</span>
+                              <span>{booking.foodDonation?.contactPhone}</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Mail className="w-3 h-3" />
-                              <span>{collection.donatorEmail}</span>
+                              <span>{booking.foodDonation?.contactEmail}</span>
                             </div>
                           </div>
                         </div>
@@ -359,63 +393,63 @@ export default function MesCollectesPage() {
                           Adresse :
                         </p>
                         <p className="text-sm text-blue-600">
-                          {collection.address}
+                          {booking.foodDonation?.address}
                         </p>
-                        {collection.notes && (
-                          <>
-                            <p className="text-sm font-medium text-blue-700 mt-2 mb-1">
-                              Notes :
-                            </p>
-                            <p className="text-sm text-blue-600">
-                              {collection.notes}
-                            </p>
-                          </>
-                        )}
+                        {/*{collection.notes && (*/}
+                        {/*  <>*/}
+                        {/*    <p className="text-sm font-medium text-blue-700 mt-2 mb-1">*/}
+                        {/*      Notes :*/}
+                        {/*    </p>*/}
+                        {/*    <p className="text-sm text-blue-600">*/}
+                        {/*      {collection.notes}*/}
+                        {/*    </p>*/}
+                        {/*  </>*/}
+                        {/*)}*/}
                       </div>
                     </div>
                   </div>
 
                   <div className="flex space-x-3">
-                    {collection.status === "En attente" && (
-                      <>
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={() => markAsCollected(collection.id)}
-                        >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Confirmer
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => cancelCollection(collection.id)}
-                        >
-                          <X className="w-4 h-4 mr-1" />
-                          Annuler
-                        </Button>
-                      </>
-                    )}
-                    {collection.status === "Confirmé" && (
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                        onClick={() => markAsCollected(collection.id)}
-                      >
-                        <Truck className="w-4 h-4 mr-1" />
-                        Marquer comme collecté
-                      </Button>
-                    )}
-                    {collection.status === "Planifié" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => cancelCollection(collection.id)}
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Annuler
-                      </Button>
-                    )}
+                    {/*{collection.status === "En attente" && (*/}
+                    {/*  <>*/}
+                    {/*    <Button*/}
+                    {/*      size="sm"*/}
+                    {/*      className="bg-green-600 hover:bg-green-700"*/}
+                    {/*      onClick={() => markAsCollected(collection.id)}*/}
+                    {/*    >*/}
+                    {/*      <CheckCircle className="w-4 h-4 mr-1" />*/}
+                    {/*      Confirmer*/}
+                    {/*    </Button>*/}
+                    {/*    <Button*/}
+                    {/*      variant="outline"*/}
+                    {/*      size="sm"*/}
+                    {/*      onClick={() => cancelCollection(collection.id)}*/}
+                    {/*    >*/}
+                    {/*      <X className="w-4 h-4 mr-1" />*/}
+                    {/*      Annuler*/}
+                    {/*    </Button>*/}
+                    {/*  </>*/}
+                    {/*)}*/}
+                    {/*{collection.status === "Confirmé" && (*/}
+                    {/*  <Button*/}
+                    {/*    size="sm"*/}
+                    {/*    className="bg-green-600 hover:bg-green-700"*/}
+                    {/*    onClick={() => markAsCollected(collection.id)}*/}
+                    {/*  >*/}
+                    {/*    <Truck className="w-4 h-4 mr-1" />*/}
+                    {/*    Marquer comme collecté*/}
+                    {/*  </Button>*/}
+                    {/*)}*/}
+                    {/*{collection.status === "Planifié" && (*/}
+                    {/*  <Button*/}
+                    {/*    variant="outline"*/}
+                    {/*    size="sm"*/}
+                    {/*    onClick={() => cancelCollection(collection.id)}*/}
+                    {/*  >*/}
+                    {/*    <X className="w-4 h-4 mr-1" />*/}
+                    {/*    Annuler*/}
+                    {/*  </Button>*/}
+                    {/*)}*/}
                     <Button variant="ghost" size="sm">
                       <Phone className="w-4 h-4 mr-1" />
                       Voir le numéro de téléphone

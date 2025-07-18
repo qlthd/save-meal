@@ -13,6 +13,21 @@
  */
 
 import { mapValues } from '../runtime';
+import type { User } from './User';
+import {
+    UserFromJSON,
+    UserFromJSONTyped,
+    UserToJSON,
+    UserToJSONTyped,
+} from './User';
+import type { FoodDonation } from './FoodDonation';
+import {
+    FoodDonationFromJSON,
+    FoodDonationFromJSONTyped,
+    FoodDonationToJSON,
+    FoodDonationToJSONTyped,
+} from './FoodDonation';
+
 /**
  * 
  * @export
@@ -45,10 +60,16 @@ export interface Booking {
     createdAt: Date;
     /**
      * 
-     * @type {Booking}
+     * @type {User}
      * @memberof Booking
      */
-    association: Booking | null;
+    association: User | null;
+    /**
+     * 
+     * @type {FoodDonation}
+     * @memberof Booking
+     */
+    foodDonation: FoodDonation | null;
 }
 
 /**
@@ -60,6 +81,7 @@ export function instanceOfBooking(value: object): value is Booking {
     if (!('foodDonationId' in value) || value['foodDonationId'] === undefined) return false;
     if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
     if (!('association' in value) || value['association'] === undefined) return false;
+    if (!('foodDonation' in value) || value['foodDonation'] === undefined) return false;
     return true;
 }
 
@@ -77,7 +99,8 @@ export function BookingFromJSONTyped(json: any, ignoreDiscriminator: boolean): B
         'associationId': json['associationId'],
         'foodDonationId': json['foodDonationId'],
         'createdAt': (new Date(json['createdAt'])),
-        'association': BookingFromJSON(json['association']),
+        'association': UserFromJSON(json['association']),
+        'foodDonation': FoodDonationFromJSON(json['foodDonation']),
     };
 }
 
@@ -96,7 +119,8 @@ export function BookingToJSONTyped(value?: Booking | null, ignoreDiscriminator: 
         'associationId': value['associationId'],
         'foodDonationId': value['foodDonationId'],
         'createdAt': ((value['createdAt']).toISOString()),
-        'association': BookingToJSON(value['association']),
+        'association': UserToJSON(value['association']),
+        'foodDonation': FoodDonationToJSON(value['foodDonation']),
     };
 }
 

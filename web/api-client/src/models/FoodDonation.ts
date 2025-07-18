@@ -53,10 +53,10 @@ export interface FoodDonation {
     description: string;
     /**
      * 
-     * @type {string}
+     * @type {object}
      * @memberof FoodDonation
      */
-    pickupPlace?: string | null;
+    pickupPlace?: object | null;
     /**
      * 
      * @type {string}

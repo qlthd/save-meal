@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../../user/entities/user.entity';
+import { FoodDonation } from '../../food-donation/entities/food-donation.entity';
 
 export class Booking {
   @ApiProperty()
@@ -13,6 +15,9 @@ export class Booking {
   @ApiProperty()
   createdAt: Date;
 
-  @ApiProperty({ nullable: true })
-  association?: Booking;
+  @ApiProperty({ type: () => User, nullable: true })
+  association?: User;
+
+  @ApiProperty({ type: () => FoodDonation, nullable: true })
+  foodDonation?: FoodDonation;
 }
