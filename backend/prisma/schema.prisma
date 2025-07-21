@@ -33,6 +33,7 @@ model FoodDonation {
   additionalNotes    String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  status             String   @default("pending") // pending, confirmed, collected, cancelled
   booking            Booking?
 }
 
@@ -43,7 +44,6 @@ model Booking {
   foodDonation   FoodDonation @relation(fields: [foodDonationId], references: [id])
   foodDonationId Int          @unique
   createdAt      DateTime     @default(now())
-  status         String       @default("pending") // pending, confirmed, cancelled
 }
 
 model User {

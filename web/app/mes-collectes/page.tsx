@@ -34,6 +34,7 @@ import {
   FoodDonationApi,
 } from "@/web/api-client/src";
 import { useSession } from "next-auth/react";
+import { formatToFrenchLongDate } from "@/web/shared/helpers/dateHelper";
 
 // Mock data for association collections
 const mockPastCollections = [
@@ -86,56 +87,56 @@ const mockPastCollections = [
   },
 ];
 
-const mockUpcomingCollections = [
-  {
-    id: 4,
-    title: "Conférence tech - Tech Corp",
-    description: "Buffet complet pour 80 personnes",
-    portions: 80,
-    location: "La Défense, Courbevoie",
-    address: "10 Esplanade du Général de Gaulle, 92400 Courbevoie",
-    date: "2024-01-25",
-    time: "18:30",
-    status: "Confirmé",
-    donatorName: "Sophie Laurent",
-    donatorPhone: "06 45 12 78 96",
-    donatorEmail: "s.laurent@techcorp.com",
-    scheduledFor: "2024-01-25T18:30:00",
-    notes: "Accès par l'entrée principale. Badge visiteur requis.",
-  },
-  {
-    id: 5,
-    title: "Inauguration showroom - Auto Prestige",
-    description: "Cocktail dînatoire haut de gamme",
-    portions: 60,
-    location: "Neuilly-sur-Seine",
-    address: "45 Boulevard Jean Jaurès, 92200 Neuilly-sur-Seine",
-    date: "2024-01-27",
-    time: "21:00",
-    status: "Planifié",
-    donatorName: "Marc Dubois",
-    donatorPhone: "06 78 45 12 36",
-    donatorEmail: "m.dubois@autoprestige.fr",
-    scheduledFor: "2024-01-27T21:00:00",
-    notes: "Parking disponible dans la cour. Entrée par l'arrière du bâtiment.",
-  },
-  {
-    id: 6,
-    title: "Réunion conseil d'administration",
-    description: "Déjeuner d'affaires - cuisine française",
-    portions: 20,
-    location: "1er arrondissement, Paris",
-    address: "15 Place Vendôme, 75001 Paris",
-    date: "2024-01-24",
-    time: "15:00",
-    status: "En attente",
-    donatorName: "Isabelle Moreau",
-    donatorPhone: "06 23 45 67 89",
-    donatorEmail: "i.moreau@luxurycorp.fr",
-    scheduledFor: "2024-01-24T15:00:00",
-    notes: "Confirmer 2h avant la collecte.",
-  },
-];
+// const mockUpcomingCollections = [
+//   {
+//     id: 4,
+//     title: "Conférence tech - Tech Corp",
+//     description: "Buffet complet pour 80 personnes",
+//     portions: 80,
+//     location: "La Défense, Courbevoie",
+//     address: "10 Esplanade du Général de Gaulle, 92400 Courbevoie",
+//     date: "2024-01-25",
+//     time: "18:30",
+//     status: "Confirmé",
+//     donatorName: "Sophie Laurent",
+//     donatorPhone: "06 45 12 78 96",
+//     donatorEmail: "s.laurent@techcorp.com",
+//     scheduledFor: "2024-01-25T18:30:00",
+//     notes: "Accès par l'entrée principale. Badge visiteur requis.",
+//   },
+//   {
+//     id: 5,
+//     title: "Inauguration showroom - Auto Prestige",
+//     description: "Cocktail dînatoire haut de gamme",
+//     portions: 60,
+//     location: "Neuilly-sur-Seine",
+//     address: "45 Boulevard Jean Jaurès, 92200 Neuilly-sur-Seine",
+//     date: "2024-01-27",
+//     time: "21:00",
+//     status: "Planifié",
+//     donatorName: "Marc Dubois",
+//     donatorPhone: "06 78 45 12 36",
+//     donatorEmail: "m.dubois@autoprestige.fr",
+//     scheduledFor: "2024-01-27T21:00:00",
+//     notes: "Parking disponible dans la cour. Entrée par l'arrière du bâtiment.",
+//   },
+//   {
+//     id: 6,
+//     title: "Réunion conseil d'administration",
+//     description: "Déjeuner d'affaires - cuisine française",
+//     portions: 20,
+//     location: "1er arrondissement, Paris",
+//     address: "15 Place Vendôme, 75001 Paris",
+//     date: "2024-01-24",
+//     time: "15:00",
+//     status: "En attente",
+//     donatorName: "Isabelle Moreau",
+//     donatorPhone: "06 23 45 67 89",
+//     donatorEmail: "i.moreau@luxurycorp.fr",
+//     scheduledFor: "2024-01-24T15:00:00",
+//     notes: "Confirmer 2h avant la collecte.",
+//   },
+// ];
 
 export default function MesCollectesPage() {
   const [pastCollapsed, setPastCollapsed] = useState(true);
@@ -171,35 +172,35 @@ export default function MesCollectesPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "Collecté":
+      case "collected":
         return (
           <Badge className="bg-green-100 text-green-800 border-green-200">
             <CheckCircle className="w-3 h-3 mr-1" />
             Collecté
           </Badge>
         );
-      case "Annulé":
+      case "canceled":
         return (
           <Badge className="bg-red-100 text-red-800 border-red-200">
             <X className="w-3 h-3 mr-1" />
             Annulé
           </Badge>
         );
-      case "Confirmé":
+      case "confirmed":
         return (
           <Badge className="bg-green-100 text-green-800 border-green-200">
             <CheckCircle className="w-3 h-3 mr-1" />
             Confirmé
           </Badge>
         );
-      case "Planifié":
+      case "planned":
         return (
           <Badge className="bg-blue-100 text-blue-800 border-blue-200">
             <Calendar className="w-3 h-3 mr-1" />
             Planifié
           </Badge>
         );
-      case "En attente":
+      case "pending":
         return (
           <Badge className="bg-orange-100 text-orange-800 border-orange-200">
             <Clock className="w-3 h-3 mr-1" />
@@ -320,14 +321,14 @@ export default function MesCollectesPage() {
                   <h2 className="text-xl font-semibold text-gray-900">
                     Collectes à venir ({bookings.length})
                   </h2>
-                  <Badge className="bg-green-100 text-green-800">
-                    {
-                      mockUpcomingCollections.filter(
-                        (d) => d.status === "Confirmé",
-                      ).length
-                    }{" "}
-                    confirmées
-                  </Badge>
+                  {/*<Badge className="bg-green-100 text-green-800">*/}
+                  {/*  {*/}
+                  {/*    mockUpcomingCollections.filter(*/}
+                  {/*      (d) => d.status === "Confirmé",*/}
+                  {/*    ).length*/}
+                  {/*  }{" "}*/}
+                  {/*  confirmées*/}
+                  {/*</Badge>*/}
                 </div>
                 {upcomingCollapsed ? (
                   <ChevronRight className="w-5 h-5 text-gray-500" />
@@ -345,21 +346,38 @@ export default function MesCollectesPage() {
                         <h3 className="font-semibold text-lg text-gray-900">
                           {booking.foodDonation?.title}
                         </h3>
-                        {getStatusBadge("collection.status")}
+                        {booking.foodDonation?.status &&
+                          getStatusBadge(booking.foodDonation?.status)}
                       </div>
                       {/*<p className="text-gray-600 mb-3">{booking.foodDo}</p>*/}
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="inline-flex gap-4 text-sm">
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4 text-gray-400" />
-                          {/*<span>*/}
-                          {/*  {formatDate(booking.foodDonation?.availableFrom)} à{" "}*/}
-                          {/*  {formatTime(collection.time)}*/}
-                          {/*</span>*/}
+                          <span>
+                            {booking.foodDonation?.availableFrom && (
+                              <>
+                                du{" "}
+                                {formatToFrenchLongDate(
+                                  booking.foodDonation?.availableFrom,
+                                )}{" "}
+                              </>
+                            )}
+                            {booking.foodDonation?.availableTo && (
+                              <>
+                                au{" "}
+                                {formatToFrenchLongDate(
+                                  booking.foodDonation?.availableTo,
+                                )}
+                              </>
+                            )}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <MapPin className="w-4 h-4 text-gray-400" />
-                          {/*<span>{collection.location}</span>*/}
+                          <span>
+                            {booking.foodDonation?.pickupPlace?.toString()}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4 text-gray-400" />
@@ -389,71 +407,47 @@ export default function MesCollectesPage() {
                       </div>
 
                       <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                        <p className="text-sm font-medium text-blue-700 mb-1">
-                          Adresse :
-                        </p>
-                        <p className="text-sm text-blue-600">
+                        <span className="text-sm font-medium text-blue-700 mb-1">
+                          Adresse complète: {""}
+                        </span>
+                        <span className="text-sm text-blue-600">
                           {booking.foodDonation?.address}
-                        </p>
-                        {/*{collection.notes && (*/}
-                        {/*  <>*/}
-                        {/*    <p className="text-sm font-medium text-blue-700 mt-2 mb-1">*/}
-                        {/*      Notes :*/}
-                        {/*    </p>*/}
-                        {/*    <p className="text-sm text-blue-600">*/}
-                        {/*      {collection.notes}*/}
-                        {/*    </p>*/}
-                        {/*  </>*/}
-                        {/*)}*/}
+                        </span>
+                        {booking.foodDonation?.description && (
+                          <p>
+                            <span className="text-sm font-medium text-blue-700 mt-2 mb-1">
+                              Notes: {""}
+                            </span>
+                            <span className="text-sm text-blue-600">
+                              {booking.foodDonation?.description}
+                            </span>
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   <div className="flex space-x-3">
-                    {/*{collection.status === "En attente" && (*/}
-                    {/*  <>*/}
-                    {/*    <Button*/}
-                    {/*      size="sm"*/}
-                    {/*      className="bg-green-600 hover:bg-green-700"*/}
-                    {/*      onClick={() => markAsCollected(collection.id)}*/}
-                    {/*    >*/}
-                    {/*      <CheckCircle className="w-4 h-4 mr-1" />*/}
-                    {/*      Confirmer*/}
-                    {/*    </Button>*/}
-                    {/*    <Button*/}
-                    {/*      variant="outline"*/}
-                    {/*      size="sm"*/}
-                    {/*      onClick={() => cancelCollection(collection.id)}*/}
-                    {/*    >*/}
-                    {/*      <X className="w-4 h-4 mr-1" />*/}
-                    {/*      Annuler*/}
-                    {/*    </Button>*/}
-                    {/*  </>*/}
-                    {/*)}*/}
-                    {/*{collection.status === "Confirmé" && (*/}
-                    {/*  <Button*/}
-                    {/*    size="sm"*/}
-                    {/*    className="bg-green-600 hover:bg-green-700"*/}
-                    {/*    onClick={() => markAsCollected(collection.id)}*/}
-                    {/*  >*/}
-                    {/*    <Truck className="w-4 h-4 mr-1" />*/}
-                    {/*    Marquer comme collecté*/}
-                    {/*  </Button>*/}
-                    {/*)}*/}
-                    {/*{collection.status === "Planifié" && (*/}
-                    {/*  <Button*/}
-                    {/*    variant="outline"*/}
-                    {/*    size="sm"*/}
-                    {/*    onClick={() => cancelCollection(collection.id)}*/}
-                    {/*  >*/}
-                    {/*    <X className="w-4 h-4 mr-1" />*/}
-                    {/*    Annuler*/}
-                    {/*  </Button>*/}
-                    {/*)}*/}
-                    <Button variant="ghost" size="sm">
-                      <Phone className="w-4 h-4 mr-1" />
-                      Voir le numéro de téléphone
-                    </Button>
+                    {booking.foodDonation?.status === "confirmed" && (
+                      <>
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          // onClick={() => markAsCollected(collection.id)}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          Marquer comme collectée
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          // onClick={() => cancelCollection(collection.id)}
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Annuler
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </Card>
               ))}
@@ -492,89 +486,89 @@ export default function MesCollectesPage() {
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-4 mt-4">
-              {mockPastCollections.map((collection) => (
-                <Card key={collection.id} className="p-6 opacity-90">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="font-semibold text-lg text-gray-700">
-                          {collection.title}
-                        </h3>
-                        {getStatusBadge(collection.status)}
-                      </div>
-                      <p className="text-gray-500 mb-3">
-                        {collection.description}
-                      </p>
+              {/*{mockPastCollections.map((collection) => (*/}
+              {/*  <Card key={collection.id} className="p-6 opacity-90">*/}
+              {/*    <div className="flex items-start justify-between mb-4">*/}
+              {/*      <div className="flex-1">*/}
+              {/*        <div className="flex items-center space-x-3 mb-2">*/}
+              {/*          <h3 className="font-semibold text-lg text-gray-700">*/}
+              {/*            {collection.title}*/}
+              {/*          </h3>*/}
+              {/*          {getStatusBadge(collection.status)}*/}
+              {/*        </div>*/}
+              {/*        <p className="text-gray-500 mb-3">*/}
+              {/*          {collection.description}*/}
+              {/*        </p>*/}
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                          <span>
-                            {formatDate(collection.date)} à{" "}
-                            {formatTime(collection.time)}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="w-4 h-4 text-gray-400" />
-                          <span>{collection.location}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Users className="w-4 h-4 text-gray-400" />
-                          <span>{collection.portions} portions</span>
-                        </div>
-                      </div>
+              {/*        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">*/}
+              {/*          <div className="flex items-center space-x-2">*/}
+              {/*            <Calendar className="w-4 h-4 text-gray-400" />*/}
+              {/*            <span>*/}
+              {/*              {formatDate(collection.date)} à{" "}*/}
+              {/*              {formatTime(collection.time)}*/}
+              {/*            </span>*/}
+              {/*          </div>*/}
+              {/*          <div className="flex items-center space-x-2">*/}
+              {/*            <MapPin className="w-4 h-4 text-gray-400" />*/}
+              {/*            <span>{collection.location}</span>*/}
+              {/*          </div>*/}
+              {/*          <div className="flex items-center space-x-2">*/}
+              {/*            <Users className="w-4 h-4 text-gray-400" />*/}
+              {/*            <span>{collection.portions} portions</span>*/}
+              {/*          </div>*/}
+              {/*        </div>*/}
 
-                      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm font-medium text-gray-700 mb-2">
-                          Contact donateur :
-                        </p>
-                        <div className="flex flex-col space-y-1 text-sm text-gray-600">
-                          <span>{collection.donatorName}</span>
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center space-x-1">
-                              <Phone className="w-3 h-3" />
-                              <span>{collection.donatorPhone}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Mail className="w-3 h-3" />
-                              <span>{collection.donatorEmail}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+              {/*        <div className="mt-4 p-3 bg-gray-50 rounded-lg">*/}
+              {/*          <p className="text-sm font-medium text-gray-700 mb-2">*/}
+              {/*            Contact donateur :*/}
+              {/*          </p>*/}
+              {/*          <div className="flex flex-col space-y-1 text-sm text-gray-600">*/}
+              {/*            <span>{collection.donatorName}</span>*/}
+              {/*            <div className="flex items-center space-x-4">*/}
+              {/*              <div className="flex items-center space-x-1">*/}
+              {/*                <Phone className="w-3 h-3" />*/}
+              {/*                <span>{collection.donatorPhone}</span>*/}
+              {/*              </div>*/}
+              {/*              <div className="flex items-center space-x-1">*/}
+              {/*                <Mail className="w-3 h-3" />*/}
+              {/*                <span>{collection.donatorEmail}</span>*/}
+              {/*              </div>*/}
+              {/*            </div>*/}
+              {/*          </div>*/}
+              {/*        </div>*/}
 
-                      {collection.notes && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                          <p className="text-sm font-medium text-gray-700 mb-1">
-                            Notes :
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {collection.notes}
-                          </p>
-                        </div>
-                      )}
+              {/*        {collection.notes && (*/}
+              {/*          <div className="mt-3 p-3 bg-gray-50 rounded-lg">*/}
+              {/*            <p className="text-sm font-medium text-gray-700 mb-1">*/}
+              {/*              Notes :*/}
+              {/*            </p>*/}
+              {/*            <p className="text-sm text-gray-600">*/}
+              {/*              {collection.notes}*/}
+              {/*            </p>*/}
+              {/*          </div>*/}
+              {/*        )}*/}
 
-                      {collection.status === "Collecté" &&
-                        collection.collectedAt && (
-                          <div className="mt-3 text-sm text-green-600">
-                            <ClipboardCheck className="w-4 h-4 inline mr-1" />
-                            Collecté le{" "}
-                            {new Date(
-                              collection.collectedAt,
-                            ).toLocaleDateString("fr-FR")}{" "}
-                            à{" "}
-                            {new Date(
-                              collection.collectedAt,
-                            ).toLocaleTimeString("fr-FR", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </div>
-                        )}
-                    </div>
-                  </div>
-                </Card>
-              ))}
+              {/*        {collection.status === "Collecté" &&*/}
+              {/*          collection.collectedAt && (*/}
+              {/*            <div className="mt-3 text-sm text-green-600">*/}
+              {/*              <ClipboardCheck className="w-4 h-4 inline mr-1" />*/}
+              {/*              Collecté le{" "}*/}
+              {/*              {new Date(*/}
+              {/*                collection.collectedAt,*/}
+              {/*              ).toLocaleDateString("fr-FR")}{" "}*/}
+              {/*              à{" "}*/}
+              {/*              {new Date(*/}
+              {/*                collection.collectedAt,*/}
+              {/*              ).toLocaleTimeString("fr-FR", {*/}
+              {/*                hour: "2-digit",*/}
+              {/*                minute: "2-digit",*/}
+              {/*              })}*/}
+              {/*            </div>*/}
+              {/*          )}*/}
+              {/*      </div>*/}
+              {/*    </div>*/}
+              {/*  </Card>*/}
+              {/*))}*/}
             </CollapsibleContent>
           </Collapsible>
         </div>

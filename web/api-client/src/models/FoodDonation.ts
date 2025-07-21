@@ -131,6 +131,12 @@ export interface FoodDonation {
     updatedAt?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof FoodDonation
+     */
+    status: string;
+    /**
+     * 
      * @type {Booking}
      * @memberof FoodDonation
      */
@@ -154,6 +160,7 @@ export function instanceOfFoodDonation(value: object): value is FoodDonation {
     if (!('contactEmail' in value) || value['contactEmail'] === undefined) return false;
     if (!('latitude' in value) || value['latitude'] === undefined) return false;
     if (!('longitude' in value) || value['longitude'] === undefined) return false;
+    if (!('status' in value) || value['status'] === undefined) return false;
     return true;
 }
 
@@ -184,6 +191,7 @@ export function FoodDonationFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'additionalNotes': json['additionalNotes'] == null ? undefined : json['additionalNotes'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
         'updatedAt': json['updatedAt'] == null ? undefined : json['updatedAt'],
+        'status': json['status'],
         'booking': json['booking'] == null ? undefined : BookingFromJSON(json['booking']),
     };
 }
@@ -216,6 +224,7 @@ export function FoodDonationToJSONTyped(value?: FoodDonation | null, ignoreDiscr
         'additionalNotes': value['additionalNotes'],
         'createdAt': value['createdAt'],
         'updatedAt': value['updatedAt'],
+        'status': value['status'],
         'booking': BookingToJSON(value['booking']),
     };
 }

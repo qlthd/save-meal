@@ -53,6 +53,9 @@ export class FoodDonation {
   @ApiProperty({ required: false, nullable: true })
   updatedAt?: string;
 
+  @ApiProperty()
+  status: string;
+
   @ApiProperty({ type: () => Booking, required: false, nullable: true })
   booking?: Booking;
 }
