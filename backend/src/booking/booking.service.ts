@@ -13,12 +13,37 @@ export class BookingService {
   }
 
   async findAll(): Promise<Booking[]> {
-    return this.prisma.booking.findMany();
+    return this.prisma.booking.findMany({
+      where: { active: true },
+    });
+  }
+
+  async findOne(id: number): Promise<Booking | null> {
+    const res = await this.prisma.booking.findUnique({
+      where: { id, active: true },
+      include: {
+        foodDonation: true,
+      },
+    });
+    if (!res) return null;
+    const booking: Booking = {
+      ...res,
+      foodDonation: {
+        ...res.foodDonation,
+        pickupPlace: res.foodDonation.pickupPlace ?? null,
+        createdAt: res.foodDonation.createdAt.toISOString(),
+        updatedAt: res.foodDonation.updatedAt?.toISOString() ?? undefined,
+        availableFrom: res.foodDonation.availableFrom.toISOString(),
+        availableTo: res.foodDonation.availableTo.toISOString(),
+        additionalNotes: res.foodDonation.additionalNotes ?? undefined,
+      },
+    };
+    return booking;
   }
 
   async findByAssociation(id: number): Promise<Booking[] | null> {
     const res = await this.prisma.booking.findMany({
-      where: { associationId: id },
+      where: { associationId: id, active: true },
       include: {
         foodDonation: true,
       },
@@ -37,6 +62,13 @@ export class BookingService {
         },
       };
       return booking;
+    });
+  }
+
+  cancelBooking(id: number): Promise<Booking> {
+    return this.prisma.booking.update({
+      where: { id },
+      data: { active: false },
     });
   }
 }

@@ -22,6 +22,10 @@ import {
     BookingToJSON,
 } from '../models/index';
 
+export interface CancelBookingRequest {
+    id: string;
+}
+
 export interface CreateRequest {
     body: object;
 }
@@ -34,6 +38,38 @@ export interface FindByAssociationRequest {
  * 
  */
 export class BookingApi extends runtime.BaseAPI {
+
+    /**
+     * Annuler une réservation
+     */
+    async cancelBookingRaw(requestParameters: CancelBookingRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling cancelBooking().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/booking/{id}/cancel`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Annuler une réservation
+     */
+    async cancelBooking(requestParameters: CancelBookingRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.cancelBookingRaw(requestParameters, initOverrides);
+    }
 
     /**
      * Créer une réservation

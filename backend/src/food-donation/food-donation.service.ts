@@ -41,6 +41,13 @@ export class FoodDonationService {
     });
   }
 
+  updateStatus(id: number, status: string) {
+    return this.prisma.foodDonation.update({
+      where: { id },
+      data: { status },
+    });
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} foodDonation`;
   }

@@ -35,6 +35,7 @@ import {
 } from "@/web/api-client/src";
 import { useSession } from "next-auth/react";
 import { formatToFrenchLongDate } from "@/web/shared/helpers/dateHelper";
+import toast from "react-hot-toast";
 
 // Mock data for association collections
 const mockPastCollections = [
@@ -143,6 +144,7 @@ export default function MesCollectesPage() {
   const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookingIdCancelled, setBookingIdCancelled] = useState<number>();
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -230,9 +232,37 @@ export default function MesCollectesPage() {
     console.log(`Marking collection ${id} as collected`);
   };
 
-  const cancelCollection = (id: number) => {
-    // In a real app, this would cancel the collection
-    console.log(`Cancelling collection ${id}`);
+  const cancelBooking = (id: number) => {
+    setBookingIdCancelled(id);
+    const cancelBookingCall = async () => {
+      const api = new BookingApi(
+        new Configuration({
+          basePath:
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
+        }),
+      );
+      if (session) {
+        try {
+          await api.cancelBooking(
+            {
+              id: id.toString(),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${session.accessToken}`,
+              },
+            },
+          );
+          toast.success("Réservation annulée avec succès");
+          setBookings(bookings.filter((b) => b.id !== id));
+        } catch (error) {
+          toast.error("Erreur lors de l'annulation de la réservation");
+        } finally {
+          setBookingIdCancelled(undefined);
+        }
+      }
+    };
+    cancelBookingCall();
   };
 
   return (
@@ -441,7 +471,8 @@ export default function MesCollectesPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          // onClick={() => cancelCollection(collection.id)}
+                          disabled={bookingIdCancelled === booking.id}
+                          onClick={() => cancelBooking(booking.id)}
                         >
                           <X className="w-4 h-4 mr-1" />
                           Annuler
