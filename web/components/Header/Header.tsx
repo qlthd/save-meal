@@ -1,17 +1,14 @@
 import Link from "next/link";
-import { ArrowLeft, UserCog, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/web/components/ui/button";
 import { useState } from "react";
 import { LoginModal } from "../LoginModal";
-import { HeaderProps } from "./Header.types";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
-export const Header = (props: HeaderProps) => {
-  const { isHomePage } = props;
+export const Header = () => {
   const router = useRouter();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const { data: session, status } = useSession();
@@ -32,18 +29,6 @@ export const Header = (props: HeaderProps) => {
       <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
         <div className=" flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            {!isHomePage && (
-              <>
-                <Link
-                  href="/"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                  <span>Retour</span>
-                </Link>
-                <div className="h-6 w-px bg-gray-300" />
-              </>
-            )}
             <Link href="/" className="flex items-center">
               <img
                 src="/icons/logo.png"
@@ -55,7 +40,12 @@ export const Header = (props: HeaderProps) => {
           <div className="flex items-center gap-x-3">
             {userType === "association" && (
               <>
-                <button className="inline-flex px-3 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md text-gray-600 hover:text-green-600">
+                <button
+                  className="inline-flex px-3 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md text-gray-600 hover:text-green-600"
+                  onClick={() => {
+                    router.push("/mes-collectes");
+                  }}
+                >
                   Mes collectes
                 </button>
               </>

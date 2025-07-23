@@ -36,6 +36,7 @@ import {
 import { useSession } from "next-auth/react";
 import { formatToFrenchLongDate } from "@/web/shared/helpers/dateHelper";
 import toast from "react-hot-toast";
+import { Header } from "@/web/components/Header/Header";
 
 // Mock data for association collections
 const mockPastCollections = [
@@ -145,6 +146,8 @@ export default function MesCollectesPage() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [bookingIdCancelled, setBookingIdCancelled] = useState<number>();
+  const [donationIdConfirmed, setDonationIdConfirmed] = useState<number>();
+
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -228,8 +231,44 @@ export default function MesCollectesPage() {
   };
 
   const markAsCollected = (id: number) => {
-    // In a real app, this would update the collection status
-    console.log(`Marking collection ${id} as collected`);
+    setDonationIdConfirmed(id);
+    const updateFoodDonationStatus = async () => {
+      const api = new FoodDonationApi(
+        new Configuration({
+          basePath:
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
+        }),
+      );
+      if (session) {
+        try {
+          await api.markCollected(
+            {
+              id: id.toString(),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${session.accessToken}`,
+              },
+            },
+          );
+          toast.success("Confirmation effectuée avec succès");
+          const updatedBookings = bookings.map((b) =>
+            b.id === id && b.foodDonation
+              ? {
+                  ...b,
+                  foodDonation: { ...b.foodDonation, status: "collected" },
+                }
+              : b,
+          );
+          setBookings(updatedBookings);
+        } catch (error) {
+          toast.error("Erreur lors de la confirmation");
+        } finally {
+          setDonationIdConfirmed(undefined);
+        }
+      }
+    };
+    updateFoodDonationStatus();
   };
 
   const cancelBooking = (id: number) => {
@@ -267,59 +306,7 @@ export default function MesCollectesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/"
-              className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Retour</span>
-            </Link>
-            <div className="h-6 w-px bg-gray-300" />
-            <Link href="/" className="flex items-center">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F3d47985c501b449a8a6a74efa2d87067%2Fdd2c6da340014829b54eb2b52cfcd003?format=webp&width=800"
-                alt="Save Meal Logo"
-                className="h-14 w-auto"
-              />
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/association">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-green-600"
-              >
-                Rechercher
-              </Button>
-            </Link>
-            <Link href="/profil">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-green-600 p-2"
-                title="Mon profil"
-              >
-                <UserCircle className="w-5 h-5" />
-              </Button>
-            </Link>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLoginModalOpen(true)}
-            >
-              Se connecter
-            </Button>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              Association
-            </Badge>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       {/* Login Modal */}
       <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
@@ -463,7 +450,12 @@ export default function MesCollectesPage() {
                         <Button
                           size="sm"
                           className="bg-green-600 hover:bg-green-700"
-                          // onClick={() => markAsCollected(collection.id)}
+                          disabled={
+                            donationIdConfirmed === booking.foodDonationId
+                          }
+                          onClick={() =>
+                            markAsCollected(booking.foodDonationId)
+                          }
                         >
                           <CheckCircle className="w-4 h-4 mr-1" />
                           Marquer comme collectée

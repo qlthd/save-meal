@@ -65,6 +65,28 @@ export class BookingService {
     });
   }
 
+  async findByFoodDonation(foodDonationId: number): Promise<Booking | null> {
+    const result = await this.prisma.booking.findUnique({
+      where: { foodDonationId: foodDonationId, active: true },
+      include: {
+        foodDonation: true,
+      },
+    });
+    if (!result) return null;
+    return {
+      ...result,
+      foodDonation: {
+        ...result.foodDonation,
+        pickupPlace: result.foodDonation.pickupPlace ?? null,
+        createdAt: result.foodDonation.createdAt.toISOString(),
+        updatedAt: result.foodDonation.updatedAt?.toISOString() ?? undefined,
+        availableFrom: result.foodDonation.availableFrom.toISOString(),
+        availableTo: result.foodDonation.availableTo.toISOString(),
+        additionalNotes: result.foodDonation.additionalNotes ?? undefined,
+      },
+    };
+  }
+
   cancelBooking(id: number): Promise<Booking> {
     return this.prisma.booking.update({
       where: { id },

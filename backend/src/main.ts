@@ -2,10 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { OpenApiNestFactory } from 'nest-openapi-tools';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
+  app.use(bodyParser.json({ limit: '50mb' }));
 
   await OpenApiNestFactory.configure(
     app,

@@ -33,6 +33,10 @@ export interface FindOneRequest {
     id: string;
 }
 
+export interface MarkCollectedRequest {
+    id: string;
+}
+
 export interface RemoveRequest {
     id: string;
 }
@@ -136,6 +140,38 @@ export class FoodDonationApi extends runtime.BaseAPI {
      */
     async findOne(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.findOneRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Mettre à jour le statut d\'une collecte à collecté
+     */
+    async markCollectedRaw(requestParameters: MarkCollectedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling markCollected().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/food-donation/{id}/status`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Mettre à jour le statut d\'une collecte à collecté
+     */
+    async markCollected(requestParameters: MarkCollectedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.markCollectedRaw(requestParameters, initOverrides);
     }
 
     /**
