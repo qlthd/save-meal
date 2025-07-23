@@ -34,6 +34,7 @@ export class FoodDonationService {
               createdAt: fd.booking.createdAt,
               associationId: fd.booking.associationId,
               foodDonationId: fd.booking.foodDonationId,
+              isOver: fd.availableFrom < new Date(),
             }
           : undefined,
       };

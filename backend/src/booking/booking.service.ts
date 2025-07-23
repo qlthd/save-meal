@@ -37,6 +37,7 @@ export class BookingService {
         availableTo: res.foodDonation.availableTo.toISOString(),
         additionalNotes: res.foodDonation.additionalNotes ?? undefined,
       },
+      isOver: res.foodDonation.availableTo < new Date(),
     };
     return booking;
   }
@@ -48,6 +49,7 @@ export class BookingService {
         foodDonation: true,
       },
     });
+
     return res.map((b) => {
       const booking: Booking = {
         ...b,
@@ -60,6 +62,7 @@ export class BookingService {
           availableTo: b.foodDonation.availableTo.toISOString(),
           additionalNotes: b.foodDonation.additionalNotes ?? undefined,
         },
+        isOver: b.foodDonation.availableTo < new Date(),
       };
       return booking;
     });
@@ -84,6 +87,7 @@ export class BookingService {
         availableTo: result.foodDonation.availableTo.toISOString(),
         additionalNotes: result.foodDonation.additionalNotes ?? undefined,
       },
+      isOver: result.foodDonation.availableTo < new Date(),
     };
   }
 

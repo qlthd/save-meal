@@ -20,4 +20,7 @@ export class Booking {
 
   @ApiProperty({ type: () => FoodDonation, nullable: true })
   foodDonation?: FoodDonation;
+
+  @ApiProperty({ nullable: true })
+  isOver?: boolean;
 }
