@@ -6,12 +6,16 @@ import { Toaster as Sonner } from "@/web/components/ui/sonner";
 import { TooltipProvider } from "@/web/components/ui/tooltip";
 import { SessionProvider } from "next-auth/react";
 import LoadGoogleProvider from "@/web/components/LoadGoogleProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <html lang="fr">
       <link
@@ -21,15 +25,17 @@ export default function RootLayout({
       />
 
       <body>
-        <LoadGoogleProvider>
-          <SessionProvider>
-            <TooltipProvider>
-              {children}
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </SessionProvider>
-        </LoadGoogleProvider>
+        <QueryClientProvider client={queryClient}>
+          <LoadGoogleProvider>
+            <SessionProvider>
+              <TooltipProvider>
+                {children}
+                <Toaster />
+                <Sonner />
+              </TooltipProvider>
+            </SessionProvider>
+          </LoadGoogleProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

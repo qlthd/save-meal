@@ -28,12 +28,28 @@ import {
 } from "@/web/components/organisms/CreateCollecteForm/CreateCollecteForm.types";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import PlaceAutocomplete from "react-google-autocomplete";
+import { useMutation } from "@tanstack/react-query";
 
 export const CreateCollecteForm = () => {
   const router = useRouter();
   const [images, setImages] = useState<ImageItem[]>([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const api = new FoodDonationApi(
+    new Configuration({
+      basePath: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
+    }),
+  );
+
+  const useCreateFoodDonation = () => {
+    return useMutation({
+      mutationFn: (data: any) =>
+        api.create({
+          createFoodDonationDto: data,
+        }),
+    });
+  };
+  const { isPending, mutate } = useCreateFoodDonation();
 
   const {
     register,
@@ -109,61 +125,37 @@ export const CreateCollecteForm = () => {
   };
 
   const onSubmit: SubmitHandler<FoodDonationFormValue> = (data) => {
-    setIsSubmitted(true);
-    toast.success("Collecte crée avec succès !");
+    const payload = {
+      title: data.title,
+      description: data.description,
+      foodType: data.foodType,
+      estimatedPortions: Number(data.estimatedPortions),
+      pickupPlace: data.pickupPlace || "",
+      address: data.address,
+      pickupInstructions: data.pickupInstructions || "",
+      availableFrom: getDateWithCustomTime(
+        data.startTime,
+        new Date(data.startDate),
+      ),
+      availableTo: getDateWithCustomTime(data.endTime, new Date(data.endDate)),
+      contactName: data.contactName,
+      contactPhone: data.contactPhone,
+      contactEmail: data.contactEmail,
+      additionalNotes: data.additionalNotes ?? "",
+      latitude: data.latitude,
+      longitude: data.longitude,
+    };
 
-    const api = new FoodDonationApi(
-      new Configuration({
-        basePath:
-          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
-      }),
-    );
-    api
-      .create({
-        createFoodDonationDto: {
-          title: data.title,
-          description: data.description,
-          foodType: data.foodType,
-          estimatedPortions: Number(data.estimatedPortions),
-          pickupPlace: data.pickupPlace || "",
-          address: data.address,
-          pickupInstructions: data.pickupInstructions || "",
-          availableFrom: getDateWithCustomTime(
-            data.startTime,
-            new Date(data.startDate),
-          ),
-          availableTo: getDateWithCustomTime(
-            data.endTime,
-            new Date(data.endDate),
-          ),
-          contactName: data.contactName,
-          contactPhone: data.contactPhone,
-          contactEmail: data.contactEmail,
-          additionalNotes: data.additionalNotes ?? "",
-          latitude: data.latitude,
-          longitude: data.longitude,
-          // dietaryInfo: {
-          //   vegetarian: data.dietaryInfo.vegetarian || false,
-          //   vegan: data.dietaryInfo.vegan || false,
-          //   glutenFree: data.dietaryInfo.glutenFree || false,
-          //   halal: data.dietaryInfo.halal || false,
-          //   kosher: data.dietaryInfo.kosher || false,
-          // },
-        },
-      })
-      .then(() => {
-        toast.success("Collecte crée avec succès !");
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Collecte créée avec succès !");
         router.push("/mes-donations");
-      })
-      .catch((error) => {
-        // Handle error, e.g., show an error message
-        console.error("Erreur lors de la création de la collecte :", error);
-        setError("root", {
-          type: "manual",
-          message:
-            "Une erreur est survenue lors de la création de la collecte.",
-        });
-      });
+      },
+      onError: (error: Error) => {
+        console.error(error);
+        toast.error("Une erreur est survenue lors de la création.");
+      },
+    });
   };
 
   const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
@@ -603,7 +595,7 @@ export const CreateCollecteForm = () => {
             type="submit"
             size="lg"
             className="bg-gradient-to-r from-green-600 to-orange-500 hover:from-green-700 hover:to-orange-600 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:bg-red"
-            disabled={isSubmitted}
+            disabled={isPending}
           >
             <CheckCircle className="w-5 h-5 mr-2" />
             Créer la collecte
