@@ -1,5 +1,10 @@
 import { useRouter } from "next/navigation";
-import { SubmitHandler, useForm, useWatch } from "react-hook-form";
+import {
+  SubmitHandler,
+  useForm,
+  UseFormSetError,
+  useWatch,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as React from "react";
 import toast from "react-hot-toast";
@@ -69,6 +74,15 @@ export const CreateCollecteForm = () => {
     name: "donationType",
   });
 
+  const watchedDates = useWatch({
+    control,
+    name: ["startDate", "startTime", "endDate", "endTime"],
+  });
+
+  useEffect(() => {
+    validateStartEndDates();
+  }, [watchedDates[0], watchedDates[1], watchedDates[2], watchedDates[3]]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const files = Array.from(e.target.files);
@@ -124,7 +138,36 @@ export const CreateCollecteForm = () => {
     return resultDate.toISOString();
   };
 
+  const validateStartEndDates = () => {
+    const startDate = watchedDates[0];
+    const startTime = watchedDates[1];
+    const endDate = watchedDates[2];
+    const endTime = watchedDates[3];
+    if (startDate && endDate) {
+      const start = startTime
+        ? new Date(`${startDate}T${startTime}`)
+        : new Date(startDate);
+      const end = endTime
+        ? new Date(`${endDate}T${endTime}`)
+        : new Date(endDate);
+
+      if (start > end) {
+        const messageStart =
+          "Les date/heure de début doivent être avant les date/heure de fin.";
+
+        setError("startDate", { type: "manual", message: messageStart });
+
+        return true;
+      } else {
+        clearErrors("startDate");
+      }
+    }
+
+    return false;
+  };
+
   const onSubmit: SubmitHandler<FoodDonationFormValue> = (data) => {
+    if (!validateStartEndDates()) return;
     const payload = {
       title: data.title,
       description: data.description,
