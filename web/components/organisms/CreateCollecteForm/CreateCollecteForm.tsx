@@ -157,13 +157,13 @@ export const CreateCollecteForm = () => {
 
         setError("startDate", { type: "manual", message: messageStart });
 
-        return true;
+        return false;
       } else {
         clearErrors("startDate");
       }
     }
 
-    return false;
+    return true;
   };
 
   const onSubmit: SubmitHandler<FoodDonationFormValue> = (data) => {
