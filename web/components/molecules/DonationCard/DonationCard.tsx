@@ -67,8 +67,17 @@ export const DonationCard = (props: DonationCardProps) => {
     }
   };
 
+  const isDateExpired = () => {
+    const now = new Date();
+    const date = new Date(donation.availableTo);
+    return date < now;
+  };
+
   return (
-    <Card key={donation.title} className="p-4 border-l-4 border-l-red-400">
+    <Card
+      key={donation.title}
+      className={`p-4 border-l-4 ${isDateExpired() ? "border-l-red-400" : "border-l-green-100"}`}
+    >
       <div className="flex justify-between items-start mb-3">
         <div className="flex gap-x-2">
           <HandHelping className="text-green-600" />
