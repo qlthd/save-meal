@@ -52,7 +52,10 @@ export const Header = () => {
             )}
             {userType === "donateur" && (
               <>
-                <button className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md text-gray-600 hover:text-green-600">
+                <button
+                  className="inline-flex items-center justify-center whitespace-nowrap text-sm px-3 py-2 font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md text-gray-600 hover:text-green-600"
+                  onClick={() => router.push("/mes-donations")}
+                >
                   Gérer mes dons
                 </button>
                 <button
