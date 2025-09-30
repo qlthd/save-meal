@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/web/components/ui/button";
 import { Card } from "@/web/components/ui/card";
 import { Badge } from "@/web/components/ui/badge";
@@ -12,42 +12,39 @@ import {
 import {
   ChefHat,
   Calendar,
-  MapPin,
-  Users,
   ChevronDown,
   ChevronRight,
-  Clock,
   CheckCircle,
   AlertCircle,
-  Edit,
 } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/web/components/Header/Header";
-import {
-  Configuration,
-  FoodDonationApi,
-  FoodDonationListResponse,
-} from "@/web/api-client/src";
+import { Configuration, FoodDonationApi } from "@/web/api-client/src";
 import { DonationCard } from "@/web/components/molecules/DonationCard/DonationCard";
+import { useQuery } from "@tanstack/react-query";
 
 export default function MesDonationsPage() {
   const [pastCollapsed, setPastCollapsed] = useState(true);
   const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
-  const [collectes, setCollectes] = useState<FoodDonationListResponse>();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const api = new FoodDonationApi(
-        new Configuration({
-          basePath:
-            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
-        }),
-      );
-      const fetched = await api.findAll();
-      setCollectes(fetched);
-    };
-    fetchData();
-  }, []);
+  const fetchDonations = async () => {
+    const api = new FoodDonationApi(
+      new Configuration({
+        basePath:
+          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3004",
+      }),
+    );
+    return await api.findAll();
+  };
+
+  const {
+    data: collectes,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["donations"],
+    queryFn: fetchDonations,
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
