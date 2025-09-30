@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FoodDonation } from "@/web/api-client/src";
 
 export const FoodDonationSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
@@ -57,4 +58,8 @@ export type ImageItem = {
   id: string;
   file: File;
   preview: string;
+};
+
+export type CreateCollecteFormProps = {
+  existingDonation?: FoodDonation;
 };

@@ -16,11 +16,14 @@
 import * as runtime from '../runtime';
 import type {
   CreateFoodDonationDto,
+  FoodDonation,
   FoodDonationListResponse,
 } from '../models/index';
 import {
     CreateFoodDonationDtoFromJSON,
     CreateFoodDonationDtoToJSON,
+    FoodDonationFromJSON,
+    FoodDonationToJSON,
     FoodDonationListResponseFromJSON,
     FoodDonationListResponseToJSON,
 } from '../models/index';
@@ -114,7 +117,7 @@ export class FoodDonationApi extends runtime.BaseAPI {
 
     /**
      */
-    async findOneRaw(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async findOneRaw(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FoodDonation>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -133,13 +136,14 @@ export class FoodDonationApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => FoodDonationFromJSON(jsonValue));
     }
 
     /**
      */
-    async findOne(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.findOneRaw(requestParameters, initOverrides);
+    async findOne(requestParameters: FindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FoodDonation> {
+        const response = await this.findOneRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

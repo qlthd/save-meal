@@ -8,11 +8,14 @@ import {
   Users,
   HandHelping,
   Clock,
+  SquarePen,
 } from "lucide-react";
 import { Badge } from "@/web/components/ui/badge";
+import { useRouter } from "next/navigation";
 
 export const DonationCard = (props: DonationCardProps) => {
   const { donation } = props;
+  const router = useRouter();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("fr-FR", {
@@ -57,7 +60,7 @@ export const DonationCard = (props: DonationCardProps) => {
         );
       case "pending":
         return (
-          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
+          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100">
             <Clock className="w-3 h-3 mr-1" />
             En attente
           </Badge>
@@ -73,6 +76,10 @@ export const DonationCard = (props: DonationCardProps) => {
     return date < now;
   };
 
+  const onEditClick = () => {
+    router.push(`/donner/${donation.id}/edit`);
+  };
+
   return (
     <Card
       key={donation.title}
@@ -85,7 +92,16 @@ export const DonationCard = (props: DonationCardProps) => {
             {donation.title}
           </h3>
         </div>
-        {getStatusBadge(donation.status)}
+        <div className="inline-flex gap-x-4">
+          {getStatusBadge(donation.status)}
+          <button
+            type="button"
+            className="rounded-full bg-gray-200 p-2 hover:bg-gray-400 transition-colors"
+            onClick={onEditClick}
+          >
+            <SquarePen size={16} className="text-gray-700" />
+          </button>
+        </div>
       </div>
       <p className="text-sm mb-3">{donation.description}</p>
       <div className="space-y-2 text-sm md:inline-flex md:space-y-0 md:space-x-6">

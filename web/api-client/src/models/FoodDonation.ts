@@ -29,6 +29,12 @@ import {
 export interface FoodDonation {
     /**
      * 
+     * @type {number}
+     * @memberof FoodDonation
+     */
+    id: number;
+    /**
+     * 
      * @type {string}
      * @memberof FoodDonation
      */
@@ -147,6 +153,7 @@ export interface FoodDonation {
  * Check if a given object implements the FoodDonation interface.
  */
 export function instanceOfFoodDonation(value: object): value is FoodDonation {
+    if (!('id' in value) || value['id'] === undefined) return false;
     if (!('title' in value) || value['title'] === undefined) return false;
     if (!('foodType' in value) || value['foodType'] === undefined) return false;
     if (!('estimatedPortions' in value) || value['estimatedPortions'] === undefined) return false;
@@ -174,6 +181,7 @@ export function FoodDonationFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
+        'id': json['id'],
         'title': json['title'],
         'foodType': json['foodType'],
         'estimatedPortions': json['estimatedPortions'],
@@ -207,6 +215,7 @@ export function FoodDonationToJSONTyped(value?: FoodDonation | null, ignoreDiscr
 
     return {
         
+        'id': value['id'],
         'title': value['title'],
         'foodType': value['foodType'],
         'estimatedPortions': value['estimatedPortions'],

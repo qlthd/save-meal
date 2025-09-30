@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateFoodDonationDto } from './dto/update-food-donation.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, FoodDonation as FD2 } from 'generated/prisma';
+import { Prisma } from 'generated/prisma';
 import { FoodDonation } from './entities/food-donation.entity';
+
 @Injectable()
 export class FoodDonationService {
   constructor(private prisma: PrismaService) {}
@@ -49,8 +50,35 @@ export class FoodDonationService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} foodDonation`;
+  async findOne(id: number): Promise<FoodDonation | null> {
+    const res = await this.prisma.foodDonation.findUnique({
+      where: { id },
+      include: {
+        booking: true,
+      },
+    });
+    if (!res) {
+      return null;
+    }
+
+    return {
+      ...res,
+      pickupPlace: res.pickupPlace ?? null,
+      createdAt: res.createdAt.toISOString(),
+      updatedAt: res.updatedAt?.toISOString() ?? undefined,
+      availableFrom: res.availableFrom.toISOString(),
+      availableTo: res.availableTo.toISOString(),
+      additionalNotes: res.additionalNotes ?? undefined,
+      booking: res.booking
+        ? {
+            id: res.booking.id,
+            createdAt: res.booking.createdAt,
+            associationId: res.booking.associationId,
+            foodDonationId: res.booking.foodDonationId,
+            isOver: res.availableFrom < new Date(),
+          }
+        : undefined,
+    };
   }
 
   update(id: number, updateFoodDonationDto: UpdateFoodDonationDto) {

@@ -25,6 +25,7 @@ import { BookingService } from '../booking/booking.service';
 import { AuthRequest } from '../auth/types/AuthRequest';
 import { UpdateStatusRequest } from './requests/update-status.request';
 import { JwtAuthGuard } from '../guards/jwt-auth.gard';
+import { FoodDonation } from './entities/food-donation.entity';
 
 @Controller('food-donation')
 export class FoodDonationController {
@@ -59,8 +60,12 @@ export class FoodDonationController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.foodDonationService.findOne(+id);
+  @ApiOkResponse({
+    description: 'Specific food donation',
+    type: FoodDonation || null,
+  })
+  async findOne(@Param('id') id: string): Promise<FoodDonation | null> {
+    return await this.foodDonationService.findOne(+id);
   }
 
   @Patch(':id')

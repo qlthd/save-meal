@@ -2,8 +2,8 @@
 
 import { Header } from "@/web/components/Header/Header";
 import * as React from "react";
-import { CreateCollecteTitle } from "@/web/components/molecules/CreateCollecteTitle";
 import { CreateCollecteForm } from "@/web/components/organisms/CreateCollecteForm/CreateCollecteForm";
+import { CreateCollecteTitle } from "@/web/components/molecules/CreateCollectionTitle/CreateCollecteTitle";
 
 export default function DonnerPage() {
   return (

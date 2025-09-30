@@ -27,6 +27,7 @@ import {
   TrashIcon,
 } from "lucide-react";
 import {
+  CreateCollecteFormProps,
   FoodDonationFormValue,
   FoodDonationSchema,
   ImageItem,
@@ -34,8 +35,10 @@ import {
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import PlaceAutocomplete from "react-google-autocomplete";
 import { useMutation } from "@tanstack/react-query";
+import { extractDateAndTimeFromDateString } from "@/web/shared/helpers/dateHelper";
 
-export const CreateCollecteForm = () => {
+export const CreateCollecteForm = (props: CreateCollecteFormProps) => {
+  const { existingDonation } = props;
   const router = useRouter();
   const [images, setImages] = useState<ImageItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,6 +59,22 @@ export const CreateCollecteForm = () => {
   };
   const { isPending, mutate } = useCreateFoodDonation();
 
+  const buildDefaultValues = () => {
+    if (!existingDonation) return {};
+    const { date: startDate, time: startTime } =
+      extractDateAndTimeFromDateString(existingDonation?.availableFrom);
+    const { date: endDate, time: endTime } = extractDateAndTimeFromDateString(
+      existingDonation?.availableTo,
+    );
+    return {
+      ...existingDonation,
+      startDate: startDate,
+      startTime: startTime,
+      endDate: endDate,
+      endTime: endTime,
+    };
+  };
+
   const {
     register,
     handleSubmit,
@@ -66,7 +85,9 @@ export const CreateCollecteForm = () => {
     clearErrors,
   } = useForm<FoodDonationFormValue>({
     resolver: zodResolver(FoodDonationSchema),
-    defaultValues: { donationType: "now" },
+    defaultValues: existingDonation
+      ? buildDefaultValues()
+      : { donationType: "now" },
   });
 
   const donationType = useWatch({

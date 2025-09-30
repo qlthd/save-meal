@@ -3,6 +3,9 @@ import { Booking } from '../../booking/entities/booking.entity';
 
 export class FoodDonation {
   @ApiProperty()
+  id: number;
+
+  @ApiProperty()
   title: string;
 
   @ApiProperty()
